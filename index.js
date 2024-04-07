@@ -6,14 +6,14 @@ document.getElementById("register").addEventListener("click", function(){
     form.append('nick', nick);
     form.append('pass', pass);
 
-    fetch("http://localhost:8001/register", {
+    fetch("http://localhost:3000/register", {
         method: "POST",
         body: form,
         mode: 'no-cors'
     })
     .then((resp) => {
         if (!resp.ok) {
-            throw new Error('Registration failed');
+            throw new Error('nnnn failed');
         }
         console.log(resp.json);
         return resp.json();
@@ -30,7 +30,7 @@ document.getElementById("register").addEventListener("click", function(){
     });
 });
 
-let socket = new WebSocket("ws://localhost:8002");
+let socket = new WebSocket("ws://localhost:8090");
 
 // Define WebSocket event handlers
 socket.onopen = function (evt) {
