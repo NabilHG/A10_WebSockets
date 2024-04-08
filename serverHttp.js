@@ -20,36 +20,49 @@ app.use(bodyParser.json());
 
 const userDataFile = 'user_data.json';
 
+const server = app.listen(3000, () => {
+  console.log("Server started at 3000");
+});
+
 app.post('/register', (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
-    const nick = fields.nick;
-    const pass = fields.pass;
+    if (err) {
+      console.error('Error parsing the form:', err);
+      return res.status(500).json({ message: 'Error parsing the form data' });
+    }
 
-    const user = {
-      nick,
-      pass
-    };
+    const data = fields;
+    const nick = data.nick[0];
+    const pass = data.pass[0];
 
     let userData = [];
     try {
       userData = JSON.parse(fs.readFileSync(userDataFile, 'utf8'));
     } catch (err) {
       if (err.code === 'ENOENT') {
-        userData = [];
         console.log('User data file not found, creating a new one.');
-      } else if (err.message === 'Unexpected end of JSON input') {
-        console.error('Error reading user data: Unexpected end of JSON input. Check for missing braces or extra characters in the file.');
       } else {
         console.error('Error reading user data:', err);
+        return res.status(500).json({ message: 'Error reading user data' });
       }
     }
+ 
+    let exist = false;
+    userData.forEach(user => {
+        if(user.nick === nick && user.pass === pass){
+          exist = true;
+        }
+    });
 
-    userData.push(user);
+    if (exist) {
+      return res.json({ message: 'User already registered' });
+    }
 
+    userData.push({ nick, pass });
     const updatedUserData = JSON.stringify(userData, null, 2);
 
-    fs.writeFile(userDataFile, updatedUserData, (err) => {
+    fs.writeFile(userDataFile, updatedUserData, err => {
       if (err) {
         console.error('Error writing user data:', err);
         return res.status(500).json({ message: 'Internal Server Error' });
@@ -60,34 +73,46 @@ app.post('/register', (req, res) => {
   });
 });
 
-const server = app.listen(3000, () => {
-  console.log("Server started at 3000");
-});
-// const server = http.createServer( (req,res)=>{
-//    console.log("Server iniciat a 8089",req)
 
-//   let filePath = path.join(__dirname, req.url);
-//   fs.access(filePath,fs.constants.F_OK,(error)=>{
-//       if(error){
-//           res.write("recurs innexistent");
-//           res.end();
-//           return;
-//       }
-//       fs.readFile(filePath,(err,data)=>{
-//           if(err){
-//               res.write("no s'ha pogut llegir el recurs")
-//               res.end();
-//               return;
-//           }
-//           res.write(data);
-//           res.end();
-//           return;
-//       })
-//   })
-// })
-// server.listen(8089,()=>{
-//   console.log("Server iniciat a 8089")
-// })
+
+
+
+app.post('/login', (req, res) => {
+  const form = new formidable.IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error('Error parsing the form:', err);
+      return res.status(500).json({ message: 'Error parsing the form data' });
+    }
+
+    const { nick, pass } = fields;
+
+    let userData = [];
+    try {
+      userData = JSON.parse(fs.readFileSync(userDataFile, 'utf8'));
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        console.log('User data file not found.');
+        return res.status(500).json({ message: 'User data file not found' });
+      } else {
+        console.error('Error reading user data:', err);
+        return res.status(500).json({ message: 'Error reading user data' });
+      }
+    }
+
+    // Verificar si el usuario existe
+    let exist = false;
+    userData.forEach(user => {
+        if(user.nick === nick && user.pass === pass){
+          exist = true;
+        }
+    });
+
+    return res.json({ exist });
+  });
+});
+
+
 
 //WebSocket server
 
@@ -106,8 +131,9 @@ const ws_server = new WebSocketServer({
 });
 
 ws_server.on('request', (request) => {
-    console.log("WebSocket");
     const connexio = request.accept(null, request.origin);
+    connexio.sendUTF('Hola Cliente');
+
     connexio.on('message', (message) => {
         console.log("Missatge rebut", message.utf8Data);
     });
@@ -116,3 +142,4 @@ ws_server.on('request', (request) => {
         console.log("Tancada la connexió");
     })
 });
+

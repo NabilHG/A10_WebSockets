@@ -32,11 +32,41 @@ document.getElementById("register").addEventListener("click", function(){
 
 let socket = new WebSocket("ws://localhost:8090");
 
-// Define WebSocket event handlers
-socket.onopen = function (evt) {
-  console.log("Conectat amb el servidor");
-  socket.send("Hola server");
-};
+document.getElementById("login").addEventListener('click', function(){
+  
+  let nick = document.getElementById("nick").value;
+  let pass = document.getElementById("pass").value;
+
+  fetch("http://localhost:3000/login", {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nick, pass }),
+    })
+    .then(resp => {
+        if (!resp.ok) {
+            throw new Error('Request failed');
+        }
+        return resp.json();
+    })
+    .then(data => {
+        if (data.userExists) {
+            console.log("Login successful");
+        } else {
+            console.log("User not found");
+        }
+    })
+    .catch(error => console.error('Error:', error));
+  // if(){
+  //   socket.onopen = function (evt) {
+  //     console.log("Conectat amb el servidor");
+  //     socket.send('{nick:'+nick+', pass:'+pass+'}');
+  //   };
+  // }  
+  
+})
+
 
 socket.onmessage = function (evt) {
   console.log("text del servidor:", evt.data);
