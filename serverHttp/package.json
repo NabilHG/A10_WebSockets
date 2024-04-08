@@ -2,6 +2,7 @@
   "dependencies": {
     "body-parse": "^0.1.0",
     "cors": "^2.8.5",
+    "cors-anywhere": "^0.4.4",
     "express": "^4.19.2",
     "formidable": "^3.5.1",
     "fs": "^0.0.1-security",
