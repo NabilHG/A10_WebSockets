@@ -4,8 +4,8 @@ const bodyParser = require('body-parser');
 const formidable = require('formidable');
 const fs = require('fs');
 const WebSocketServer = require('websocket').server;
-const http = require('http'); 
-const path =require("path")
+const http = require('http');
+const path = require("path")
 
 const app = express();
 app.use(express.static(path.join(__dirname, 'serverHttp')));
@@ -47,12 +47,12 @@ app.post('/register', (req, res) => {
         return res.status(500).json({ message: 'Error reading user data' });
       }
     }
- 
+
     let exist = false;
     userData.forEach(user => {
-        if(user.nick === nick && user.pass === pass){
-          exist = true;
-        }
+      if (user.nick === nick && user.pass === pass) {
+        exist = true;
+      }
     });
 
     if (exist) {
@@ -77,38 +77,43 @@ app.post('/register', (req, res) => {
 
 
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
     if (err) {
       console.error('Error parsing the form:', err);
       return res.status(500).json({ message: 'Error parsing the form data' });
-    }
-
-    const { nick, pass } = fields;
-
+    } 
+     const data = fields;
+    //  console.log(data);
+      const nick = data.nick[0];
+      // console.log(nick);
+      const pass = data.pass[0];
+    console.log(nick, pass, "info");
     let userData = [];
     try {
       userData = JSON.parse(fs.readFileSync(userDataFile, 'utf8'));
     } catch (err) {
       if (err.code === 'ENOENT') {
-        console.log('User data file not found.');
-        return res.status(500).json({ message: 'User data file not found' });
+        console.log('User data file not found, creating a new one.');
       } else {
         console.error('Error reading user data:', err);
         return res.status(500).json({ message: 'Error reading user data' });
       }
     }
-
-    // Verificar si el usuario existe
+    // console.log(userData, "infoUser");
     let exist = false;
     userData.forEach(user => {
-        if(user.nick === nick && user.pass === pass){
-          exist = true;
-        }
+      if (user.nick === nick && user.pass === pass) {
+        exist = true;
+      }
     });
-
-    return res.json({ exist });
+    // console.log(exist);
+    if (exist) {
+      return res.json({ exist: true, message: 'User found' });
+    } else {
+      return res.json({ exist: false, message: 'User not found' });
+    }
   });
 });
 
@@ -119,27 +124,27 @@ app.post('/login', (req, res) => {
 const websocketserver = http.createServer((req, res) => {
   res.write('resposta');
   res.end()
-  });
-  
-websocketserver.listen(8090, () => { 
-console.log("WebSocketServer 8090"); 
+});
+
+websocketserver.listen(8090, () => {
+  console.log("WebSocketServer 8090");
 });
 
 const ws_server = new WebSocketServer({
-    httpServer: websocketserver,
-    autoAcceptConnections: false
+  httpServer: websocketserver,
+  autoAcceptConnections: false
 });
 
 ws_server.on('request', (request) => {
-    const connexio = request.accept(null, request.origin);
-    connexio.sendUTF('Hola Cliente');
+  const connexio = request.accept(null, request.origin);
+  connexio.sendUTF('Hola Cliente');
 
-    connexio.on('message', (message) => {
-        console.log("Missatge rebut", message.utf8Data);
-    });
-    connexio.on('close', () => {
-        connexio.close();
-        console.log("Tancada la connexió");
-    })
+  connexio.on('message', (message) => {
+    console.log("Missatge rebut", message.utf8Data);
+  });
+  connexio.on('close', () => {
+    connexio.close();
+    console.log("Tancada la connexió");
+  })
 });
 

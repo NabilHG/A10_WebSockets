@@ -334,5 +334,25 @@
   {
     "nick": "ts",
     "pass": "1234"
+  },
+  {
+    "nick": "tr",
+    "pass": "tr"
+  },
+  {
+    "nick": "tr",
+    "pass": "trr"
+  },
+  {
+    "nick": "dd",
+    "pass": "drf"
+  },
+  {
+    "nick": "bil",
+    "pass": "drf"
+  },
+  {
+    "nick": "nabil",
+    "pass": "12345"
   }
 ]
