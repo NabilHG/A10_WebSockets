@@ -74,22 +74,18 @@ app.post('/register', (req, res) => {
 });
 
 
-
-
-
 app.post('/login', async (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
     if (err) {
       console.error('Error parsing the form:', err);
       return res.status(500).json({ message: 'Error parsing the form data' });
-    } 
-     const data = fields;
-    //  console.log(data);
-      const nick = data.nick[0];
-      // console.log(nick);
-      const pass = data.pass[0];
-    console.log(nick, pass, "info");
+    }
+
+    const data = fields;
+    const nick = data.nick[0];
+    const pass = data.pass[0];
+
     let userData = [];
     try {
       userData = JSON.parse(fs.readFileSync(userDataFile, 'utf8'));
@@ -101,14 +97,53 @@ app.post('/login', async (req, res) => {
         return res.status(500).json({ message: 'Error reading user data' });
       }
     }
-    // console.log(userData, "infoUser");
+
     let exist = false;
     userData.forEach(user => {
       if (user.nick === nick && user.pass === pass) {
         exist = true;
       }
     });
-    // console.log(exist);
+
+    if (exist) {
+      return res.json({ exist: true, message: 'User found' });
+    } else {
+      return res.json({ exist: false, message: 'User not found' });
+    }
+  });
+});
+
+app.post('/logOut', async (req, res) => {
+  const form = new formidable.IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error('Error parsing the form:', err);
+      return res.status(500).json({ message: 'Error parsing the form data' });
+    }
+
+    const data = fields;
+    const nick = data.nick[0];
+    const pass = data.pass[0];
+
+    let userData = [];
+    try {
+      userData = JSON.parse(fs.readFileSync(userDataFile, 'utf8'));
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        console.log('User data file not found, creating a new one.');
+      } else {
+        console.error('Error reading user data:', err);
+        return res.status(500).json({ message: 'Error reading user data' });
+      }
+    }
+
+    let exist = false;
+    userData.forEach(user => {
+      if (user.nick === nick && user.pass === pass) {
+        exist = true;
+      }
+    });
+
     if (exist) {
       return res.json({ exist: true, message: 'User found' });
     } else {
@@ -135,16 +170,54 @@ const ws_server = new WebSocketServer({
   autoAcceptConnections: false
 });
 
-ws_server.on('request', (request) => {
-  const connexio = request.accept(null, request.origin);
-  connexio.sendUTF('Hola Cliente');
+let connexions = [];
 
-  connexio.on('message', (message) => {
-    console.log("Missatge rebut", message.utf8Data);
-  });
-  connexio.on('close', () => {
-    connexio.close();
-    console.log("Tancada la connexió");
+ws_server.on('request', (request) => {
+  const conn = request.accept(null, request.origin);
+  // let infoConn= {"nick":nick,"pass":pass, "conn": conn}
+  // infoConn.stringify(r);
+  // connexions.push(connexio);
+  // console.log(connexions, "conn");
+  // conn.sendUTF('Hola Cliente');
+
+  conn.on('message', (message) => {
+    console.log("primero?")
+    if (message.type === 'utf8') {
+        try {
+          console.log(message.utf8Data);
+            const userData = JSON.parse(message.utf8Data);
+            console.log("Datos del usuario:", userData);
+            userData.conn = conn;
+            addConn(connexions, userData.nick, userData.pass, userData.conn);
+            // connexions.push(userData);   
+            // console.log(connexions);     
+          } catch (error) {
+            console.error("Error al analizar los datos del usuario:", error);
+        }
+    } else {
+      console.log("???")
+    }
+});
+  conn.on('close', () => {
+    console.log("segundo?");
+    conn.close();
+    console.log("Tancaxda la connexió");
   })
 });
+
+
+//TODO
+//try to get the message when onclose to be able to delete an specific connexion
+
+function addConn(connexions, nick, pass, conn) {
+
+  const existUser = connexions.some(user => user.nick === nick && user.pass === pass);
+
+  if (!existUser) {
+      connexions.push({ nick: nick, pass: pass, conn: conn });
+      console.log(`Usuario ${nick} añadido.`);
+  } else {
+      console.log(`El usuario ${nick} ya existe.`);
+  }
+}
 
