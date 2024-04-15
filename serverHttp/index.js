@@ -2,7 +2,6 @@
 let info = document.getElementById("info");
 
 document.getElementById("register").addEventListener("click", function () {
-    console.log("client")
     let form = new FormData();
     let nick = document.getElementById("nick").value;
     let pass = document.getElementById("pass").value;
@@ -13,20 +12,18 @@ document.getElementById("register").addEventListener("click", function () {
         method: "POST",
         body: form,
     })
-    .then((resp) => {
-        if (!resp.ok) {
-            throw new Error('nnnn failed');
-        }
-        return resp.json(); // Devuelve la promesa que resuelve con los datos JSON
-    })
-    .then((data) => {
-        console.log(data);
-        info.innerHTML = JSON.stringify(data.message); // Aquí puedes manipular los datos como desees
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        const messageElement = document.getElementById("message");
-    });
+        .then((resp) => {
+            if (!resp.ok) {
+                throw new Error('nnnn failed');
+            }
+            return resp.json(); // Devuelve la promesa que resuelve con los datos JSON
+        })
+        .then((data) => {
+            info.innerHTML = data.message;
+        })
+        .catch((error) => {
+            info.innerHTML = "Error: " + error;
+        });
 });
 
 let socket;
@@ -39,8 +36,7 @@ document.getElementById("login").addEventListener('click', function () {
     form.append('nick', nick);
     form.append('pass', pass);
 
-    console.log(nick, pass, "info");
-    console.log(JSON.stringify({ "nick": nick, "pass": pass }));
+
     fetch("http://localhost:3000/login", {
         method: "POST",
         body: form,
@@ -50,17 +46,23 @@ document.getElementById("login").addEventListener('click', function () {
         }
         resp.json().then(
             function (respJson) {
-                console.log(respJson);
                 if (respJson.exist) {
                     socket = new WebSocket("ws://localhost:8090");
+                    socket.onmessage = function (evt) {
+                        console.log("text del servidor:", evt.data);
+                    };
                     socket.onopen = function (evt) {
-                        console.log("Conectat amb el servidor");
+                        info.innerHTML = "Login successful, with user: " + nick;
                         socket.send(JSON.stringify({ "nick": nick, "pass": pass }));
                     };
+                } else {
+                    info.innerHTML = respJson.message;
                 }
             }
         )
-    }).catch(error => console.error('Error:', error));
+    }).catch((error) => {
+        info.innerHTML = "Error: " + error;
+    });
 });
 
 document.getElementById("logOut").addEventListener('click', function () {
@@ -71,7 +73,6 @@ document.getElementById("logOut").addEventListener('click', function () {
     form.append('nick', nick);
     form.append('pass', pass);
 
-    console.log(nick, pass, "info");
     fetch("http://localhost:3000/logOut", {
         method: "POST",
         body: form,
@@ -83,22 +84,22 @@ document.getElementById("logOut").addEventListener('click', function () {
             function (respJson) {
                 console.log(respJson);
                 if (respJson.exist) {
-                    console.log("cerrando desde el cliente");
                     socket.send(JSON.stringify({ "nick": nick, "pass": pass, "close": true }));
                     socket.onclose = function (evt) {
-                        console.log("Log Out");
+                        info.innerHTML = "Log out successful, with user: " + nick;
                     }
+                } else {
+                    info.innerHTML = respJson.message;
                 }
             }
         )
-    }).catch(error => console.error('Error:', error));
+    }).catch((error) => {
+        info.innerHTML = "Error: " + error;
+    });
 });
 
 
 
-// socket.onmessage = function (evt) {
-//     console.log("text del servidor:", evt.data);
-// };
 
 
 

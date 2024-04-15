@@ -176,7 +176,6 @@ ws_server.on('request', (request) => {
   const conn = request.accept(null, request.origin);
 
   conn.on('message', (message) => {
-    console.log("primero?");
     if (message.type === 'utf8') {
       try {
         console.log(message.utf8Data);
@@ -185,47 +184,42 @@ ws_server.on('request', (request) => {
         userData.conn = conn;
         addConn(connexions, userData.nick, userData.pass, userData.conn);
         let connToDelete;
+        let addUser = true;
         if (userData.close) {
-          const connToDelete = connexions.find(conexion => conexion.nick === userData.nick && conexion.pass === userData.pass);
+          connToDelete = connexions.find(conexion => conexion.nick === userData.nick && conexion.pass === userData.pass);
           if (connToDelete) {
-              connToDelete.conn.close();
-              connexions.splice(connexions.indexOf(connToDelete), 1);
-              console.log("Se eliminó la conexión:", connToDelete);
+            connToDelete.conn.close();
+            connexions.splice(connexions.indexOf(connToDelete), 1);
+            addUser = false;
+            console.log("Se eliminó la conexión:", connToDelete);
           } else {
-              console.log("No se encontró la conexión a eliminar.");
+            console.log("No se encontró la conexión a eliminar.");
           }
-      } else {
-          console.log("qwe");
-      }
-      console.log(connexions.length, "cantidad conexiones");
+        }
+        console.log(connexions.length, "cantidad conexiones");
+        conn.send(JSON.stringify({ "nick": userData.nick, "addUser": addUser }));
       } catch (error) {
         console.error("Error al analizar los datos del usuario:", error);
       }
-    } else {
-      console.log("???");
     }
   });
 
   conn.on('close', () => {
-    console.log("segundo?");
-    console.log("Tancaxda la connexió");
+    console.log("Tancada la connexió");
   });
 });
 
-
-
-//TODO
-//try to get the message when onclose to be able to delete an specific connexion
 
 function addConn(connexions, nick, pass, conn) {
 
   const existUser = connexions.some(user => user.nick === nick && user.pass === pass);
 
   if (!existUser) {
-      connexions.push({ nick: nick, pass: pass, conn: conn });
-      console.log(`Usuario ${nick} añadido.`);
+    connexions.push({ nick: nick, pass: pass, conn: conn });
+    console.log(`Usuario ${nick} añadido.`);
   } else {
-      console.log(`El usuario ${nick} ya existe.`);
+    console.log(`El usuario ${nick} ya existe.`);
   }
 }
+
 
