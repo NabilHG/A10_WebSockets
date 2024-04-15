@@ -174,36 +174,44 @@ let connexions = [];
 
 ws_server.on('request', (request) => {
   const conn = request.accept(null, request.origin);
-  // let infoConn= {"nick":nick,"pass":pass, "conn": conn}
-  // infoConn.stringify(r);
-  // connexions.push(connexio);
-  // console.log(connexions, "conn");
-  // conn.sendUTF('Hola Cliente');
 
   conn.on('message', (message) => {
-    console.log("primero?")
+    console.log("primero?");
     if (message.type === 'utf8') {
-        try {
-          console.log(message.utf8Data);
-            const userData = JSON.parse(message.utf8Data);
-            console.log("Datos del usuario:", userData);
-            userData.conn = conn;
-            addConn(connexions, userData.nick, userData.pass, userData.conn);
-            // connexions.push(userData);   
-            // console.log(connexions);     
-          } catch (error) {
-            console.error("Error al analizar los datos del usuario:", error);
-        }
+      try {
+        console.log(message.utf8Data);
+        const userData = JSON.parse(message.utf8Data);
+        console.log("Datos del usuario:", userData);
+        userData.conn = conn;
+        addConn(connexions, userData.nick, userData.pass, userData.conn);
+        let connToDelete;
+        if (userData.close) {
+          const connToDelete = connexions.find(conexion => conexion.nick === userData.nick && conexion.pass === userData.pass);
+          if (connToDelete) {
+              connToDelete.conn.close();
+              connexions.splice(connexions.indexOf(connToDelete), 1);
+              console.log("Se eliminó la conexión:", connToDelete);
+          } else {
+              console.log("No se encontró la conexión a eliminar.");
+          }
+      } else {
+          console.log("qwe");
+      }
+      console.log(connexions.length, "cantidad conexiones");
+      } catch (error) {
+        console.error("Error al analizar los datos del usuario:", error);
+      }
     } else {
-      console.log("???")
+      console.log("???");
     }
-});
+  });
+
   conn.on('close', () => {
     console.log("segundo?");
-    conn.close();
     console.log("Tancaxda la connexió");
-  })
+  });
 });
+
 
 
 //TODO

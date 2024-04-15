@@ -1,3 +1,6 @@
+
+let info = document.getElementById("info");
+
 document.getElementById("register").addEventListener("click", function () {
     console.log("client")
     let form = new FormData();
@@ -10,21 +13,20 @@ document.getElementById("register").addEventListener("click", function () {
         method: "POST",
         body: form,
     })
-        .then((resp) => {
-            if (!resp.ok) {
-                throw new Error('nnnn failed');
-            }
-            console.log(resp.json);
-            return resp.json();
-        })
-        .then((respJSON) => {
-            console.log(respJSON.message);
-            const messageElement = document.getElementById("message"); 
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            const messageElement = document.getElementById("message");
-        });
+    .then((resp) => {
+        if (!resp.ok) {
+            throw new Error('nnnn failed');
+        }
+        return resp.json(); // Devuelve la promesa que resuelve con los datos JSON
+    })
+    .then((data) => {
+        console.log(data);
+        info.innerHTML = JSON.stringify(data.message); // Aquí puedes manipular los datos como desees
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        const messageElement = document.getElementById("message");
+    });
 });
 
 let socket;
@@ -82,8 +84,10 @@ document.getElementById("logOut").addEventListener('click', function () {
                 console.log(respJson);
                 if (respJson.exist) {
                     console.log("cerrando desde el cliente");
-                    socket.send(JSON.stringify({ "nick": nick, "pass": pass }));
-                    socket.close();
+                    socket.send(JSON.stringify({ "nick": nick, "pass": pass, "close": true }));
+                    socket.onclose = function (evt) {
+                        console.log("Log Out");
+                    }
                 }
             }
         )
@@ -95,6 +99,7 @@ document.getElementById("logOut").addEventListener('click', function () {
 // socket.onmessage = function (evt) {
 //     console.log("text del servidor:", evt.data);
 // };
+
 
 
 

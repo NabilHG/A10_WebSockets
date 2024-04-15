@@ -1,406 +1,78 @@
 [
   {
-    "nick": [
-      "ty"
-    ],
-    "pass": [
-      "ty"
-    ]
-  },
-  {
-    "nick": [
-      "gt"
-    ],
-    "pass": [
-      "tg"
-    ]
-  },
-  {
-    "nick": [
-      "a"
-    ],
-    "pass": [
-      "a"
-    ]
-  },
-  {
-    "nick": [
-      "a12"
-    ],
-    "pass": [
-      "yr"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": [
-      "test"
-    ],
-    "pass": [
-      "1234"
-    ]
-  },
-  {
-    "nick": "test",
-    "pass": "12343"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234 "
-  },
-  {
-    "nick": "tes",
-    "pass": "1234 "
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "tes",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "t",
-    "pass": "1234"
-  },
-  {
-    "nick": "nabil",
-    "pass": "1234"
-  },
-  {
-    "nick": "nabil",
-    "pass": "1234"
-  },
-  {
-    "nick": "nabil",
-    "pass": "1234"
-  },
-  {
-    "nick": "nabil",
-    "pass": "1234"
-  },
-  {
-    "nick": "nabil",
-    "pass": "1234"
-  },
-  {
-    "nick": "nabil",
-    "pass": "1234"
-  },
-  {
-    "nick": "nabil",
-    "pass": "1234"
-  },
-  {
-    "nick": "ts",
-    "pass": "1234"
-  },
-  {
-    "nick": "tr",
-    "pass": "tr"
-  },
-  {
-    "nick": "tr",
-    "pass": "trr"
-  },
-  {
-    "nick": "dd",
-    "pass": "drf"
-  },
-  {
-    "nick": "bil",
-    "pass": "drf"
-  },
-  {
-    "nick": "nabil",
-    "pass": "12345"
-  },
-  {
-    "nick": "tgyh",
-    "pass": "09"
-  },
-  {
-    "nick": "",
-    "pass": ""
-  },
-  {
-    "nick": "s",
-    "pass": "s"
+    "nick": "rftg",
+    "pass": "defrgt"
   },
   {
     "nick": "a",
     "pass": "a"
   },
   {
-    "nick": "a",
-    "pass": "s"
+    "nick": "as",
+    "pass": "a"
   },
   {
-    "nick": "s",
-    "pass": "ds"
+    "nick": "asa",
+    "pass": "a"
   },
   {
-    "nick": "rftg",
-    "pass": "defrgt"
+    "nick": "asas",
+    "pass": "a"
   },
   {
-    "nick": "defr",
-    "pass": "edfr"
+    "nick": "1",
+    "pass": "1"
   },
   {
-    "nick": "aw",
-    "pass": "aws"
+    "nick": "2",
+    "pass": "1"
+  },
+  {
+    "nick": "3",
+    "pass": "1"
+  },
+  {
+    "nick": "asd",
+    "pass": "asd"
+  },
+  {
+    "nick": "asds",
+    "pass": "asd"
   },
   {
     "nick": "nabil",
-    "pass": "nabil"
+    "pass": "1"
   },
   {
-    "nick": "de",
-    "pass": "de"
+    "nick": "nabil2",
+    "pass": "1"
   },
   {
     "nick": "as",
+    "pass": "asd"
+  },
+  {
+    "nick": "sd",
+    "pass": "sd"
+  },
+  {
+    "nick": "sss",
+    "pass": "ss"
+  },
+  {
+    "nick": "sds",
+    "pass": "sd"
+  },
+  {
+    "nick": "asd",
+    "pass": "sd"
+  },
+  {
+    "nick": "sd",
+    "pass": "sdsd"
+  },
+  {
+    "nick": "sdsd",
     "pass": "sd"
   }
 ]
