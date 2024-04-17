@@ -180,7 +180,7 @@ ws_server.on('request', (request) => {
       try {
         console.log(message.utf8Data);
         const userData = JSON.parse(message.utf8Data);
-        console.log("Datos del usuario:", userData);
+        // console.log("Datos del usuario:", userData);
         userData.conn = conn;
         addConn(connexions, userData.nick, userData.pass, userData.conn);
         let connToDelete;
@@ -188,16 +188,20 @@ ws_server.on('request', (request) => {
         if (userData.close) {
           connToDelete = connexions.find(conexion => conexion.nick === userData.nick && conexion.pass === userData.pass);
           if (connToDelete) {
+            console.log("2");
+            addUser = false;
+            connToDelete.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
             connToDelete.conn.close();
             connexions.splice(connexions.indexOf(connToDelete), 1);
             addUser = false;
-            console.log("Se eliminó la conexión:", connToDelete);
+            // console.log("Se eliminó la conexión:", connToDelete);
           } else {
             console.log("No se encontró la conexión a eliminar.");
           }
         }
         console.log(connexions.length, "cantidad conexiones");
-        conn.send(JSON.stringify({ "nick": userData.nick, "addUser": addUser }));
+        console.log(addUser, "addUser");
+        conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
       } catch (error) {
         console.error("Error al analizar los datos del usuario:", error);
       }
