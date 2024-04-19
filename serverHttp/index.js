@@ -49,40 +49,44 @@ document.getElementById("login").addEventListener('click', function () {
                 if (respJson.exist) {
                     socket = new WebSocket("ws://localhost:8090");
                     socket.onmessage = function (data) {
+                        console.log(document.getElementById("nick").value, "?");
                         let dataUser = JSON.parse(data.data);
                         console.log("text del servidor:", dataUser);
                         console.log("NICK:", dataUser.nick);
                         let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
 
-                        // Convierte userConnectedDisplay en un array utilizando Array.from
                         let userConnectedArray = Array.from(userConnectedDisplay);
 
-                        // Ahora puedes usar forEach en userConnectedArray
-                        userConnectedArray.forEach(function (element) {
+                        for (let i = 0; i < userConnectedArray.length; i++) {
+                            const element = userConnectedArray[i];
                             let nickUserDisplay = element.getAttribute("data-nick");
                             let passUserDisplay = element.getAttribute("data-pass");
-                            console.log(dataUser.nick, "nickFromServe");
-                            console.log(nickUserDisplay, "nickFromFront");
 
-                            if (dataUser.nick == nickUserDisplay && dataUser.pass == passUserDisplay && !dataUser.addUser) {
-                                console.log("delete from view");
+                            // check if user exist
+                            if (dataUser.nick === nickUserDisplay && dataUser.pass === passUserDisplay) {
+                                if (!dataUser.addUser) {
+                                    element.remove();
+                                }
+                                break;
                             }
+                        }
 
+                        if (!userConnectedArray.some(element => element.getAttribute("data-nick") === dataUser.nick && element.getAttribute("data-pass") === dataUser.pass)) {
                             let divToAppend = document.createElement("div");
-                            divToAppend.setAttribute("data-nick", nickUserDisplay);
-                            divToAppend.setAttribute("data-pass", passUserDisplay);
-                            divToAppend.innerHTML = nickUserDisplay;
+                            divToAppend.setAttribute("data-nick", dataUser.nick);
+                            divToAppend.setAttribute("data-pass", dataUser.pass);
+                            divToAppend.innerHTML = dataUser.nick;
 
-                            // Agrega el nuevo div al final del div con el ID "usersConnected"
                             document.getElementById("usersConnected").appendChild(divToAppend);
-                        });
-
-
-                        console.log(userConnectedDisplay[0].getAttribute("data-nick"));
+                        }
                     };
+
                     socket.onopen = function (evt) {
                         info.innerHTML = "Login successful, with user: " + nick;
-                        socket.send(JSON.stringify({ "nick": nick, "pass": pass }));
+                        //checking connexion is ready
+                        if (socket.readyState === WebSocket.OPEN) {
+                            socket.send(JSON.stringify({ "nick": nick, "pass": pass }));
+                        }
                     };
                 } else {
                     info.innerHTML = respJson.message;

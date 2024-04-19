@@ -194,7 +194,11 @@ ws_server.on('request', (request) => {
             connToDelete.conn.close();
             connexions.splice(connexions.indexOf(connToDelete), 1);
             addUser = false;
-            // console.log("Se eliminó la conexión:", connToDelete);
+            // Eliminar el div correspondiente del DOM
+            let userDivToDelete = document.querySelector(`[data-nick="${userData.nick}"][data-pass="${userData.pass}"]`);
+            if (userDivToDelete) {
+                userDivToDelete.remove();
+            }
           } else {
             console.log("No se encontró la conexión a eliminar.");
           }
