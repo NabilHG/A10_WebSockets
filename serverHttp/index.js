@@ -84,16 +84,17 @@ document.getElementById("login").addEventListener('click', function () {
                         }
 
 
-                        let usersInfoDisplay = [];
-                        for (let i = 0; i < userConnectedDisplay.length; i++) {
-                            const userDiv = userConnectedDisplay[i];
-                            let nick = userDiv.getAttribute("data-nick");
-                            let pass = userDiv.getAttribute("data-pass");
-                            usersInfoDisplay.push({ nick: nick, pass: pass });
-                        }
+                        // let usersInfoDisplay = [];
+                        // for (let i = 0; i < userConnectedDisplay.length; i++) {
+                        //     const userDiv = userConnectedDisplay[i];
+                        //     let nick = userDiv.getAttribute("data-nick");
+                        //     let pass = userDiv.getAttribute("data-pass");
+                        //     usersInfoDisplay.push({ nick: nick, pass: pass });
+                        // }
 
-                        console.log(usersInfoDisplay, "??");
-                        socket.send(JSON.stringify({ updateDisplay: true, usersInfoDisplay: usersInfoDisplay }));
+                        // console.log(usersInfoDisplay, "??");
+                        // socket.send(JSON.stringify({ updateDisplay: true, usersInfoDisplay: usersInfoDisplay }));
+                        // socket.send(JSON.stringify({ usersInfoDisplay: usersInfoDisplay }));
                     };
 
                     socket.onopen = function (evt) {

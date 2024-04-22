@@ -183,24 +183,24 @@ ws_server.on('request', (request) => {
         // console.log("Datos del usuario:", userData);
         console.log(userData, "¿!¿!");
         userData.conn = conn;
-        if (userData.updateDisplay) {
-          console.log("oye", userData.updateDisplay);
-          console.log("nick", userData.updateDisplay);
-          console.log("pass", userData.updateDisplay);
+        // if (userData.updateDisplay) {//here updateDisplay??
+        //   console.log("oye", userData.updateDisplay);
+        //   console.log("nick", userData.updateDisplay);
+        //   console.log("pass", userData.updateDisplay);
 
-          userData.usersInfoDisplay.forEach(user => {
+        //   userData.usersInfoDisplay.forEach(user => {
 
-            user.print = true;
-            const userJSON = JSON.stringify(user);
+        //     user.print = true;
+        //     const userJSON = JSON.stringify(user);
 
-            connexions.forEach(conn => {
-              console.log(conn, "connexiones");
-              conn.conn.send(userJSON);
+        //     connexions.forEach(conn => {
+        //       console.log(conn, "connexiones");
+        //       conn.conn.send(userJSON);
 
-            });
+        //     });
 
-          });
-        } else {
+        //   });
+        // } else {
           addConn(connexions, userData.nick, userData.pass, userData.conn);
           let connToDelete;
           let addUser = true;
@@ -224,8 +224,14 @@ ws_server.on('request', (request) => {
           }
           console.log(connexions.length, "cantidad conexiones");
           console.log(addUser, "addUser");
-          conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
-        }
+          connexions.forEach(conn => {
+            console.log(conn, "connexiones");
+            conn.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
+
+          });
+          // conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
+          //enviar dos send uno con la info y otro a todas las conexiones
+        // }
 
       } catch (error) {
         console.error("Error al analizar los datos del usuario:", error);
