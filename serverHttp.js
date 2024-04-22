@@ -183,55 +183,29 @@ ws_server.on('request', (request) => {
         // console.log("Datos del usuario:", userData);
         console.log(userData, "¿!¿!");
         userData.conn = conn;
-        // if (userData.updateDisplay) {//here updateDisplay??
-        //   console.log("oye", userData.updateDisplay);
-        //   console.log("nick", userData.updateDisplay);
-        //   console.log("pass", userData.updateDisplay);
+        addConn(connexions, userData.nick, userData.pass, userData.conn);
+        let connToDelete;
+        let addUser = true;
+        if (userData.close) {
+          connToDelete = connexions.find(conexion => conexion.nick === userData.nick && conexion.pass === userData.pass);
+          if (connToDelete) {
+            console.log("2");
+            addUser = false;
+            // connToDelete.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
+            connToDelete.conn.close();
+            connexions.splice(connexions.indexOf(connToDelete), 1);
 
-        //   userData.usersInfoDisplay.forEach(user => {
-
-        //     user.print = true;
-        //     const userJSON = JSON.stringify(user);
-
-        //     connexions.forEach(conn => {
-        //       console.log(conn, "connexiones");
-        //       conn.conn.send(userJSON);
-
-        //     });
-
-        //   });
-        // } else {
-          addConn(connexions, userData.nick, userData.pass, userData.conn);
-          let connToDelete;
-          let addUser = true;
-          if (userData.close) {
-            connToDelete = connexions.find(conexion => conexion.nick === userData.nick && conexion.pass === userData.pass);
-            if (connToDelete) {
-              console.log("2");
-              addUser = false;
-              connToDelete.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
-              connToDelete.conn.close();
-              connexions.splice(connexions.indexOf(connToDelete), 1);
-              addUser = false;
-              // Eliminar el div correspondiente del DOM
-              let userDivToDelete = document.querySelector(`[data-nick="${userData.nick}"][data-pass="${userData.pass}"]`);
-              if (userDivToDelete) {
-                userDivToDelete.remove();
-              }
-            } else {
-              console.log("No se encontró la conexión a eliminar.");
-            }
+          } else {
+            console.log("No se encontró la conexión a eliminar.");
           }
-          console.log(connexions.length, "cantidad conexiones");
-          console.log(addUser, "addUser");
-          connexions.forEach(conn => {
-            console.log(conn, "connexiones");
-            conn.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
+        }
+        console.log(connexions.length, "cantidad conexiones");
+        console.log(addUser, "addUser");
+        connexions.forEach(conn => {
+          console.log(conn.state, "connexiones");
+          conn.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
 
-          });
-          // conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
-          //enviar dos send uno con la info y otro a todas las conexiones
-        // }
+        });
 
       } catch (error) {
         console.error("Error al analizar los datos del usuario:", error);

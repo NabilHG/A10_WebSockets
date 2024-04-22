@@ -51,11 +51,10 @@ document.getElementById("login").addEventListener('click', function () {
                     socket.onmessage = function (data) {
                         console.log(document.getElementById("nick").value, "?");
                         let dataUser = JSON.parse(data.data);
-                        if(dataUser.print){
-                            console.log(dataUser);
-                        }
+
                         console.log("text del servidor:", dataUser);
                         console.log("NICK:", dataUser.nick);
+                        console.log("Add:", dataUser.addUser);
                         let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
 
                         let userConnectedArray = Array.from(userConnectedDisplay);
@@ -83,27 +82,35 @@ document.getElementById("login").addEventListener('click', function () {
                             document.getElementById("usersConnected").appendChild(divToAppend);
                         }
 
-
-                        // let usersInfoDisplay = [];
-                        // for (let i = 0; i < userConnectedDisplay.length; i++) {
-                        //     const userDiv = userConnectedDisplay[i];
-                        //     let nick = userDiv.getAttribute("data-nick");
-                        //     let pass = userDiv.getAttribute("data-pass");
-                        //     usersInfoDisplay.push({ nick: nick, pass: pass });
-                        // }
-
-                        // console.log(usersInfoDisplay, "??");
-                        // socket.send(JSON.stringify({ updateDisplay: true, usersInfoDisplay: usersInfoDisplay }));
-                        // socket.send(JSON.stringify({ usersInfoDisplay: usersInfoDisplay }));
                     };
 
                     socket.onopen = function (evt) {
+                        //TODO
+                        //Request to server all the users connected
                         info.innerHTML = "Login successful, with user: " + nick;
                         //checking connexion is ready
                         if (socket.readyState === WebSocket.OPEN) {
                             socket.send(JSON.stringify({ "nick": nick, "pass": pass }));
                         }
                     };
+                    socket.onclose = function (evt) {
+                        info.innerHTML = "Log out successful, with user: " + nick;
+                        
+                        let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
+                        let userConnectedArray = Array.from(userConnectedDisplay);
+
+                        for (let i = 0; i < userConnectedArray.length; i++) {
+                            const element = userConnectedArray[i];
+                            let nickUserDisplay = element.getAttribute("data-nick");
+                            let passUserDisplay = element.getAttribute("data-pass");
+
+                            // check if user exist
+                            if (nick === nickUserDisplay && pass === passUserDisplay) {
+                                element.remove();
+                                break;
+                            }
+                        }                    
+                    }
                 } else {
                     info.innerHTML = respJson.message;
                 }
@@ -131,12 +138,10 @@ document.getElementById("logOut").addEventListener('click', function () {
         }
         resp.json().then(
             function (respJson) {
-                console.log(respJson);
+                console.log(respJson,"asdsd");
                 if (respJson.exist) {
                     socket.send(JSON.stringify({ "nick": nick, "pass": pass, "close": true }));
-                    socket.onclose = function (evt) {
-                        info.innerHTML = "Log out successful, with user: " + nick;
-                    }
+                    
                 } else {
                     info.innerHTML = respJson.message;
                 }
