@@ -49,13 +49,39 @@ document.getElementById("login").addEventListener('click', function () {
                 if (respJson.exist) {
                     socket = new WebSocket("ws://localhost:8090");
                     socket.onmessage = function (data) {
-                        console.log(document.getElementById("nick").value, "?");
-                        let dataUser = JSON.parse(data.data);
 
+                        let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
+                        console.log(data);
+                        let dataUser = JSON.parse(data.data);
+                        console.log(dataUser, "ab");
+                        console.log(dataUser.connectedUsers, "bs");
+
+                        if (dataUser.connectedUsers) {
+                            let usersConnectedElement = document.getElementById("usersConnected");
+                            usersConnectedElement.innerHTML = '';
+
+                            if (Array.isArray(dataUser.connectedUsers)) {
+                                for (let i = 0; i < dataUser.connectedUsers.length; i++) {
+                                    let user = dataUser.connectedUsers[i];
+                                    console.log(user.nick, "mm");
+                                    if (user.nick) {
+                                        console.log(user.nick);
+                                        let divToAppend = document.createElement("div");
+                                        divToAppend.setAttribute("data-nick", user.nick);
+                                        divToAppend.setAttribute("data-pass", user.pass);
+                                        divToAppend.textContent = user.nick;
+                                        usersConnectedElement.appendChild(divToAppend);
+                                    } else {
+                                        console.log("Nick is undefined for user at index", i);
+                                    }
+                                }
+                            } else {
+                                console.error('Expected an array, but got:', dataUser.connectedUsers);
+                            }
+                        }
                         console.log("text del servidor:", dataUser);
                         console.log("NICK:", dataUser.nick);
                         console.log("Add:", dataUser.addUser);
-                        let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
 
                         let userConnectedArray = Array.from(userConnectedDisplay);
 
@@ -63,8 +89,10 @@ document.getElementById("login").addEventListener('click', function () {
                             const element = userConnectedArray[i];
                             let nickUserDisplay = element.getAttribute("data-nick");
                             let passUserDisplay = element.getAttribute("data-pass");
+                            if (dataUser.nick == 'undefined' || nickUserDisplay == 'undefined') {
+                                element.remove();
+                            }
 
-                            // check if user exist
                             if (dataUser.nick === nickUserDisplay && dataUser.pass === passUserDisplay) {
                                 if (!dataUser.addUser) {
                                     element.remove();
@@ -78,24 +106,27 @@ document.getElementById("login").addEventListener('click', function () {
                             divToAppend.setAttribute("data-nick", dataUser.nick);
                             divToAppend.setAttribute("data-pass", dataUser.pass);
                             divToAppend.innerHTML = dataUser.nick;
-
-                            document.getElementById("usersConnected").appendChild(divToAppend);
+                            if (typeof dataUser.nick !== 'undefined' && dataUser.nick !== 'undefined') {
+                                console.log(dataUser.nick);
+                                document.getElementById("usersConnected").appendChild(divToAppend);
+                            } else {
+                                console.log("Nick is either type undefined or string 'undefined'");
+                            }
                         }
 
                     };
 
                     socket.onopen = function (evt) {
-                        //TODO
-                        //Request to server all the users connected
                         info.innerHTML = "Login successful, with user: " + nick;
                         //checking connexion is ready
                         if (socket.readyState === WebSocket.OPEN) {
                             socket.send(JSON.stringify({ "nick": nick, "pass": pass }));
                         }
+                        socket.send(JSON.stringify({ "request": "getConnectedUsers" }));
                     };
                     socket.onclose = function (evt) {
                         info.innerHTML = "Log out successful, with user: " + nick;
-                        
+
                         let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
                         let userConnectedArray = Array.from(userConnectedDisplay);
 
@@ -109,7 +140,7 @@ document.getElementById("login").addEventListener('click', function () {
                                 element.remove();
                                 break;
                             }
-                        }                    
+                        }
                     }
                 } else {
                     info.innerHTML = respJson.message;
@@ -138,10 +169,10 @@ document.getElementById("logOut").addEventListener('click', function () {
         }
         resp.json().then(
             function (respJson) {
-                console.log(respJson,"asdsd");
+                console.log(respJson, "asdsd");
                 if (respJson.exist) {
                     socket.send(JSON.stringify({ "nick": nick, "pass": pass, "close": true }));
-                    
+
                 } else {
                     info.innerHTML = respJson.message;
                 }

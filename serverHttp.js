@@ -180,7 +180,12 @@ ws_server.on('request', (request) => {
       try {
         console.log(message.utf8Data);
         const userData = JSON.parse(message.utf8Data);
-        // console.log("Datos del usuario:", userData);
+        if (userData.request === "getConnectedUsers") {
+
+          const connectedUsers = connexions.map(conn => ({ nick: conn.nick, pass: conn.pass }));
+          console.log(connectedUsers, "ff");
+          conn.send(JSON.stringify({ connectedUsers: connectedUsers }));
+        } 
         console.log(userData, "¿!¿!");
         userData.conn = conn;
         addConn(connexions, userData.nick, userData.pass, userData.conn);
