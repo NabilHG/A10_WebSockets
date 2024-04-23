@@ -51,10 +51,8 @@ document.getElementById("login").addEventListener('click', function () {
                     socket.onmessage = function (data) {
 
                         let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
-                        console.log(data);
                         let dataUser = JSON.parse(data.data);
-                        console.log(dataUser, "ab");
-                        console.log(dataUser.connectedUsers, "bs");
+                        console.log(dataUser, "data");
 
                         if (dataUser.connectedUsers) {
                             let usersConnectedElement = document.getElementById("usersConnected");
@@ -63,20 +61,20 @@ document.getElementById("login").addEventListener('click', function () {
                             if (Array.isArray(dataUser.connectedUsers)) {
                                 for (let i = 0; i < dataUser.connectedUsers.length; i++) {
                                     let user = dataUser.connectedUsers[i];
-                                    console.log(user.nick, "mm");
                                     if (user.nick) {
-                                        console.log(user.nick);
                                         let divToAppend = document.createElement("div");
                                         divToAppend.setAttribute("data-nick", user.nick);
                                         divToAppend.setAttribute("data-pass", user.pass);
                                         divToAppend.textContent = user.nick;
+                                        divToAppend.addEventListener('click', function () {
+                                            let input = document.getElementById("inputMsg");
+                                            input.value = "[@" + this.getAttribute('data-nick') + "]";
+                                            console.log(divToAppend.getAttribute('data-nick'), '1');
+                                            console.log(divToAppend.getAttribute('data-pass'), '2');
+                                        })
                                         usersConnectedElement.appendChild(divToAppend);
-                                    } else {
-                                        console.log("Nick is undefined for user at index", i);
                                     }
                                 }
-                            } else {
-                                console.error('Expected an array, but got:', dataUser.connectedUsers);
                             }
                         }
                         console.log("text del servidor:", dataUser);
@@ -107,10 +105,13 @@ document.getElementById("login").addEventListener('click', function () {
                             divToAppend.setAttribute("data-pass", dataUser.pass);
                             divToAppend.innerHTML = dataUser.nick;
                             if (typeof dataUser.nick !== 'undefined' && dataUser.nick !== 'undefined') {
-                                console.log(dataUser.nick);
+                                divToAppend.addEventListener('click', function () {
+                                    let input = document.getElementById("inputMsg");
+                                    input.value = "[@" + this.getAttribute('data-nick') + "]";
+                                    console.log(divToAppend.getAttribute('data-nick'), '3');
+                                    console.log(divToAppend.getAttribute('data-pass'), '4');
+                                })
                                 document.getElementById("usersConnected").appendChild(divToAppend);
-                            } else {
-                                console.log("Nick is either type undefined or string 'undefined'");
                             }
                         }
 
@@ -169,10 +170,8 @@ document.getElementById("logOut").addEventListener('click', function () {
         }
         resp.json().then(
             function (respJson) {
-                console.log(respJson, "asdsd");
                 if (respJson.exist) {
                     socket.send(JSON.stringify({ "nick": nick, "pass": pass, "close": true }));
-
                 } else {
                     info.innerHTML = respJson.message;
                 }
@@ -183,11 +182,8 @@ document.getElementById("logOut").addEventListener('click', function () {
     });
 });
 
-
-
-
-
-
-
-
-
+document.getElementById("btnSend").addEventListener('click', function(){
+    console.log("dd");
+    let input = document.getElementById("inputMsg");
+    console.log(input.value);
+});
