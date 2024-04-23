@@ -180,36 +180,43 @@ ws_server.on('request', (request) => {
       try {
         console.log(message.utf8Data);
         const userData = JSON.parse(message.utf8Data);
-        if (userData.request === "getConnectedUsers") {
 
+        //send users connected first time log in
+        if (userData.request === "getConnectedUsers") {
           const connectedUsers = connexions.map(conn => ({ nick: conn.nick, pass: conn.pass }));
-          console.log(connectedUsers, "ff");
           conn.send(JSON.stringify({ connectedUsers: connectedUsers }));
-        } 
-        console.log(userData, "¿!¿!");
+        }
+
+        //send message to specific user
+        if (userData.send) {
+          let userToSendMsg = connexions.find(conn => conn.nick === userData.nickMsg);
+          if (userToSendMsg) {
+            let messageObj = { from: userData.nickAuthor, message: userData.message };
+            console.log(JSON.stringify(messageObj), "AAA");
+            userToSendMsg.conn.send(JSON.stringify(messageObj));
+          }
+        }
+
+        //add conexion
         userData.conn = conn;
         addConn(connexions, userData.nick, userData.pass, userData.conn);
+
+        //to close connexion
         let connToDelete;
         let addUser = true;
+
         if (userData.close) {
           connToDelete = connexions.find(conexion => conexion.nick === userData.nick && conexion.pass === userData.pass);
           if (connToDelete) {
-            console.log("2");
             addUser = false;
-            // connToDelete.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
             connToDelete.conn.close();
             connexions.splice(connexions.indexOf(connToDelete), 1);
-
-          } else {
-            console.log("No se encontró la conexión a eliminar.");
           }
         }
-        console.log(connexions.length, "cantidad conexiones");
-        console.log(addUser, "addUser");
-        connexions.forEach(conn => {
-          console.log(conn.state, "connexiones");
-          conn.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
 
+        //send all conexiones new user logged in
+        connexions.forEach(conn => {
+          conn.conn.send(JSON.stringify({ "nick": userData.nick, "pass": userData.pass, "addUser": addUser }));
         });
 
       } catch (error) {

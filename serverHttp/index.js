@@ -53,7 +53,8 @@ document.getElementById("login").addEventListener('click', function () {
                         let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
                         let dataUser = JSON.parse(data.data);
                         console.log(dataUser, "data");
-
+                        
+                        // printing all users connected when first log in
                         if (dataUser.connectedUsers) {
                             let usersConnectedElement = document.getElementById("usersConnected");
                             usersConnectedElement.innerHTML = '';
@@ -82,7 +83,7 @@ document.getElementById("login").addEventListener('click', function () {
                         console.log("Add:", dataUser.addUser);
 
                         let userConnectedArray = Array.from(userConnectedDisplay);
-
+                        //removing any repeated user in the display before uploading
                         for (let i = 0; i < userConnectedArray.length; i++) {
                             const element = userConnectedArray[i];
                             let nickUserDisplay = element.getAttribute("data-nick");
@@ -98,7 +99,8 @@ document.getElementById("login").addEventListener('click', function () {
                                 break;
                             }
                         }
-
+                        
+                        //printing new users connected 
                         if (!userConnectedArray.some(element => element.getAttribute("data-nick") === dataUser.nick && element.getAttribute("data-pass") === dataUser.pass)) {
                             let divToAppend = document.createElement("div");
                             divToAppend.setAttribute("data-nick", dataUser.nick);
@@ -115,6 +117,13 @@ document.getElementById("login").addEventListener('click', function () {
                             }
                         }
 
+                        console.log(dataUser, "send");
+                        //handling message
+                        if(dataUser.message){
+                            console.log("From " + dataUser.from + ": " + dataUser.message);
+                        } else{
+                            console.log(dataUser.messageObj, "QQ");
+                        }
                     };
 
                     socket.onopen = function (evt) {
@@ -182,8 +191,31 @@ document.getElementById("logOut").addEventListener('click', function () {
     });
 });
 
-document.getElementById("btnSend").addEventListener('click', function(){
+document.getElementById("btnSend").addEventListener('click', function () {
     console.log("dd");
     let input = document.getElementById("inputMsg");
-    console.log(input.value);
+    let nick = extractContentNick(input.value);
+    let message = extractContentMsg(input.value);
+    let nickAuthor = document.getElementById("nick").value;
+    console.log(nick);
+    console.log(message);
+    console.log("To " + nick + ": " + message);
+    socket.send(JSON.stringify({ "message": message, "nickMsg": nick, "nickAuthor": nickAuthor, "send": true }));
+
 });
+
+function extractContentNick(msg) {
+    const match = msg.match(/\[@(.*?)\]/);
+    if (match && match[1]) {
+        return match[1];
+    }
+    return null;
+}
+
+function extractContentMsg(msg) {
+    const match = msg.match(/.*\](.*)/);
+    if (match && match[1]) {
+        return match[1];
+    }
+    return null;
+}
