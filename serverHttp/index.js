@@ -217,3 +217,9 @@ function extractContentMsg(msg) {
     }
     return msg;
 }
+
+document.querySelectorAll('[data-cell-index]').forEach(function(cell) {
+    cell.addEventListener('click', function() {
+        alert("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
+    });
+});
