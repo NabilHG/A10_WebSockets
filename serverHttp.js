@@ -187,14 +187,22 @@ ws_server.on('request', (request) => {
           conn.send(JSON.stringify({ connectedUsers: connectedUsers }));
         }
 
-        //send message to specific user
+        //send message
         if (userData.send) {
+          let messageObj = { from: userData.nickAuthor, message: userData.message };
           let userToSendMsg = connexions.find(conn => conn.nick === userData.nickMsg);
-          if (userToSendMsg) {
-            let messageObj = { from: userData.nickAuthor, message: userData.message };
-            console.log(JSON.stringify(messageObj), "AAA");
-            userToSendMsg.conn.send(JSON.stringify(messageObj));
+          if (userData.nickMsg !== 'all') {
+            if (userToSendMsg) {
+              userToSendMsg.conn.send(JSON.stringify(messageObj));
+            }
+          } else {
+            connexions.forEach(conn => {
+              if(typeof conn.nick !== 'undefined' && conn.nick !== 'undefined'){
+                conn.conn.send(JSON.stringify(messageObj));
+              }
+            });
           }
+
         }
 
         //add conexion

@@ -53,7 +53,7 @@ document.getElementById("login").addEventListener('click', function () {
                         let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
                         let dataUser = JSON.parse(data.data);
                         console.log(dataUser, "data");
-                        
+
                         // printing all users connected when first log in
                         if (dataUser.connectedUsers) {
                             let usersConnectedElement = document.getElementById("usersConnected");
@@ -70,8 +70,6 @@ document.getElementById("login").addEventListener('click', function () {
                                         divToAppend.addEventListener('click', function () {
                                             let input = document.getElementById("inputMsg");
                                             input.value = "[@" + this.getAttribute('data-nick') + "]";
-                                            console.log(divToAppend.getAttribute('data-nick'), '1');
-                                            console.log(divToAppend.getAttribute('data-pass'), '2');
                                         })
                                         usersConnectedElement.appendChild(divToAppend);
                                     }
@@ -99,7 +97,7 @@ document.getElementById("login").addEventListener('click', function () {
                                 break;
                             }
                         }
-                        
+
                         //printing new users connected 
                         if (!userConnectedArray.some(element => element.getAttribute("data-nick") === dataUser.nick && element.getAttribute("data-pass") === dataUser.pass)) {
                             let divToAppend = document.createElement("div");
@@ -110,18 +108,19 @@ document.getElementById("login").addEventListener('click', function () {
                                 divToAppend.addEventListener('click', function () {
                                     let input = document.getElementById("inputMsg");
                                     input.value = "[@" + this.getAttribute('data-nick') + "]";
-                                    console.log(divToAppend.getAttribute('data-nick'), '3');
-                                    console.log(divToAppend.getAttribute('data-pass'), '4');
+
                                 })
                                 document.getElementById("usersConnected").appendChild(divToAppend);
                             }
                         }
 
-                        console.log(dataUser, "send");
                         //handling message
-                        if(dataUser.message){
-                            console.log("From " + dataUser.from + ": " + dataUser.message);
-                        } else{
+                        if (dataUser.message) {
+                            let chat = document.getElementById("chat");
+                            let divToAppend = document.createElement("div");
+                            divToAppend.innerHTML = "From " + dataUser.from + ": " + dataUser.message;
+                            chat.appendChild(divToAppend);
+                        } else {
                             console.log(dataUser.messageObj, "QQ");
                         }
                     };
@@ -192,16 +191,15 @@ document.getElementById("logOut").addEventListener('click', function () {
 });
 
 document.getElementById("btnSend").addEventListener('click', function () {
-    console.log("dd");
     let input = document.getElementById("inputMsg");
     let nick = extractContentNick(input.value);
     let message = extractContentMsg(input.value);
     let nickAuthor = document.getElementById("nick").value;
-    console.log(nick);
-    console.log(message);
-    console.log("To " + nick + ": " + message);
+    let chat = document.getElementById("chat");
+    let divToAppend = document.createElement("div");
+    divToAppend.innerHTML = "To " + nick + ": " + message;
+    chat.appendChild(divToAppend);
     socket.send(JSON.stringify({ "message": message, "nickMsg": nick, "nickAuthor": nickAuthor, "send": true }));
-
 });
 
 function extractContentNick(msg) {
@@ -209,7 +207,7 @@ function extractContentNick(msg) {
     if (match && match[1]) {
         return match[1];
     }
-    return null;
+    return "all";
 }
 
 function extractContentMsg(msg) {
@@ -217,5 +215,5 @@ function extractContentMsg(msg) {
     if (match && match[1]) {
         return match[1];
     }
-    return null;
+    return msg;
 }
