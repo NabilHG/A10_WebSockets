@@ -70,6 +70,13 @@ document.getElementById("login").addEventListener('click', function () {
                                         divToAppend.addEventListener('click', function () {
                                             let input = document.getElementById("inputMsg");
                                             input.value = "[@" + this.getAttribute('data-nick') + "]";
+
+                                            let nickClick = this.getAttribute('data-nick');
+                                            let passClick = this.getAttribute('data-pass');
+                                            console.log(nickClick, passClick);
+                                            //adding info to a div to have the last user click, necessary to start the game
+                                            document.getElementById('usersClicked').setAttribute("data-nick", nickClick);
+                                            document.getElementById('usersClicked').setAttribute("data-pass", passClick);
                                         })
                                         usersConnectedElement.appendChild(divToAppend);
                                     }
@@ -109,6 +116,12 @@ document.getElementById("login").addEventListener('click', function () {
                                     let input = document.getElementById("inputMsg");
                                     input.value = "[@" + this.getAttribute('data-nick') + "]";
 
+                                    let nickClick = this.getAttribute('data-nick');
+                                    let passClick = this.getAttribute('data-pass');
+                                    console.log(nickClick, passClick);
+                                    //adding info to a div to have the last user click, necessary to start the game
+                                    document.getElementById('usersClicked').setAttribute("data-nick", nickClick);
+                                    document.getElementById('usersClicked').setAttribute("data-pass", passClick);
                                 })
                                 document.getElementById("usersConnected").appendChild(divToAppend);
                             }
@@ -122,6 +135,57 @@ document.getElementById("login").addEventListener('click', function () {
                             chat.appendChild(divToAppend);
                         } else {
                             console.log(dataUser.messageObj, "QQ");
+                        }
+
+                        //handling match
+                        if (dataUser.match) {
+                            console.log("////////tenemos match");
+                            let infoMatch = document.getElementById("infoMatch");
+                            let btnAccept = document.getElementById("btnAccept");
+                            let btnDecline = document.getElementById("btnDecline");
+                            infoMatch.classList.remove('d-none');
+                            infoMatch.classList.add('d-flex');
+                            infoMatch.innerHTML = dataUser.nickChallenger + " is challenging you to a game. Would you accept?";
+                            //showing buttons
+                            btnAccept.classList.remove('d-none');
+                            btnAccept.classList.add('d-flex');
+                            btnDecline.classList.remove('d-none');
+                            btnDecline.classList.add('d-flex');
+
+                            //handling decision
+                            btnAccept.addEventListener('click', function () {
+                                infoMatch.classList.remove('d-flex');
+                                infoMatch.classList.add('d-none');
+                                btnAccept.classList.remove('d-flex');
+                                btnAccept.classList.add('d-none');
+                                btnDecline.classList.remove('d-flex');
+                                btnDecline.classList.add('d-none');
+                                socket.send(JSON.stringify({ "acceptedMatch": true, "nickChallenger": dataUser.nickChallenger, "passChallenger": dataUser.passChallenger, "nickOpponent": dataUser.nickOpponent, "passOpponent": dataUser.passOpponent }));
+                            });
+
+                            btnDecline.addEventListener('click', function () {
+                                infoMatch.classList.remove('d-flex');
+                                infoMatch.classList.add('d-none');
+                                btnAccept.classList.remove('d-flex');
+                                btnAccept.classList.add('d-none');
+                                btnDecline.classList.remove('d-flex');
+                                btnDecline.classList.add('d-none');
+                                socket.send(JSON.stringify({ "acceptedMatch": false, "nickChallenger": dataUser.nickChallenger, "passChallenger": dataUser.passChallenger, "nickOpponent": dataUser.nickOpponent, "passOpponent": dataUser.passOpponent }));
+                            });
+                        }
+
+                        if (dataUser.acceptedMatch) {
+                            let infoMatch = document.getElementById("infoMatch");
+                            infoMatch.innerHTML = dataUser.nickOpponent + " has accepted the match";
+                            infoMatch.classList.remove('d-none');
+                            infoMatch.classList.add('d-flex');
+                            console.log("******match accepted******");
+                        } else if (dataUser.acceptedMatch == false) {
+                            console.log("???**??");
+                            let infoMatch = document.getElementById("infoMatch");
+                            infoMatch.classList.remove('d-none');
+                            infoMatch.classList.add('d-flex');
+                            infoMatch.innerHTML = dataUser.nickOpponent + " has decline the match";
                         }
                     };
 
@@ -218,8 +282,27 @@ function extractContentMsg(msg) {
     return msg;
 }
 
-document.querySelectorAll('[data-cell-index]').forEach(function(cell) {
-    cell.addEventListener('click', function() {
-        alert("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
+document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
+    cell.addEventListener('click', function () {
+        console.log("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
     });
+});
+
+document.getElementById("btnStart").addEventListener('click', function () {
+    let userClicked = document.getElementById("usersClicked");
+    let nickOpponent = userClicked.getAttribute('data-nick');
+    let passOpponent = userClicked.getAttribute('data-pass');
+    let nickChallenger = document.getElementById("nick").value;
+    let passChallenger = document.getElementById("pass").value;
+    if (nickOpponent == '' && passOpponent == '') {
+        document.getElementById('errorNotify').innerHTML = "Before starting a match, choose an opponent";
+    } else {
+        document.getElementById('errorNotify').innerHTML = "";
+        let infoMatchPreview = document.getElementById("infoMatch");
+        infoMatchPreview.classList.remove('d-none');
+        infoMatchPreview.classList.add('d-flex');
+        infoMatchPreview.innerHTML = "Waiting for " + nickOpponent + " to accept the match";
+        socket.send(JSON.stringify({ "match": true, "nickChallenger": nickChallenger, "passChallenger": passChallenger, "nickOpponent": nickOpponent, "passOpponent": passOpponent }));
+    }
+
 });

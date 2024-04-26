@@ -5,7 +5,8 @@ const formidable = require('formidable');
 const fs = require('fs');
 const WebSocketServer = require('websocket').server;
 const http = require('http');
-const path = require("path")
+const path = require("path");
+const { match } = require('assert');
 
 const app = express();
 app.use(express.static(path.join(__dirname, 'serverHttp')));
@@ -203,6 +204,28 @@ ws_server.on('request', (request) => {
             });
           }
 
+        }
+
+        //manage match
+        if(userData.match){
+          connToMatch = connexions.find(conexion => conexion.nick === userData.nickOpponent && conexion.pass === userData.passOpponent);
+          if(connToMatch){
+            connToMatch.conn.send(JSON.stringify({ "match": true, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+          } else {
+            console.log("not found");
+          }
+        }
+
+        if(userData.acceptedMatch){
+          console.log(userData, "acceptedMatch");
+          connToMatchChallenger = connexions.find(conexion => conexion.nick === userData.nickChallenger && conexion.pass === userData.passChallenger);
+          console.log(connToMatchChallenger, "**");
+          connToMatchChallenger.conn.send(JSON.stringify({ "acceptedMatch": true, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+        } else if(userData.acceptedMatch == false) {
+          console.log(userData, "Not acceptedMatch");
+          connToMatchChallenger = connexions.find(conexion => conexion.nick === userData.nickChallenger && conexion.pass === userData.passChallenger);
+          console.log(connToMatchChallenger, "?");
+          connToMatchChallenger.conn.send(JSON.stringify({ "acceptedMatch": false, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
         }
 
         //add conexion
