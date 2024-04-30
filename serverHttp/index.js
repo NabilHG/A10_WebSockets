@@ -143,6 +143,16 @@ document.getElementById("login").addEventListener('click', function () {
                                 console.log(dataUser.messageObj, "QQ");
                             }
 
+                            //handling turn
+                            if (dataUser.turn) {
+                                turn = dataUser.turn;
+                                let infoMatchTurn = document.getElementById("infoMatch");
+                                infoMatchTurn.classList.remove('d-none');
+                                infoMatchTurn.classList.add('d-flex');
+                                infoMatchTurn.innerHTML = "Turn: " + dataUser.turn;
+                                console.log(dataUser, "TURNNRUT")
+                            }
+
                             //handling match
                             if (dataUser.match) {
                                 console.log("////////tenemos match");
@@ -160,13 +170,12 @@ document.getElementById("login").addEventListener('click', function () {
 
                                 //handling decision
                                 btnAccept.addEventListener('click', function () {
-                                    infoMatch.classList.remove('d-flex');
-                                    infoMatch.classList.add('d-none');
                                     btnAccept.classList.remove('d-flex');
                                     btnAccept.classList.add('d-none');
                                     btnDecline.classList.remove('d-flex');
                                     btnDecline.classList.add('d-none');
                                     matchOnGoing = true;
+                                    infoMatch.innerHTML = "Turn: " + dataUser.nickChallenger;
                                     showPlayersPlaying(dataUser.nickChallenger, dataUser.passChallenger, dataUser.nickOpponent, dataUser.passOpponent);
                                     socket.send(JSON.stringify({ "acceptedMatch": true, "nickChallenger": dataUser.nickChallenger, "passChallenger": dataUser.passChallenger, "nickOpponent": dataUser.nickOpponent, "passOpponent": dataUser.passOpponent }));
                                 });
@@ -184,11 +193,12 @@ document.getElementById("login").addEventListener('click', function () {
 
                             if (dataUser.acceptedMatch) {
                                 let infoMatch = document.getElementById("infoMatch");
-                                infoMatch.innerHTML = "<b>" + dataUser.nickOpponent + "</b> &nbsp has accepted the match";
+                                infoMatch.innerHTML = "<b>" + dataUser.nickOpponent + "</b> &nbsp has accepted the match<br>Turn: " + dataUser.nickChallenger;
                                 infoMatch.classList.remove('d-none');
                                 infoMatch.classList.add('d-flex');
                                 showPlayersPlaying(dataUser.nickChallenger, dataUser.passChallenger, dataUser.nickOpponent, dataUser.passOpponent);
-                                turn = dataUser.nickOpponent;
+                                turn = dataUser.nickChallenger;
+
                                 console.log("******match accepted******");
                             } else if (dataUser.acceptedMatch == false) {
                                 console.log("???**??");
@@ -316,25 +326,36 @@ function extractContentMsg(msg) {
 
 document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
     cell.addEventListener('click', function () {
-        console.log("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
-        let nickChallenger = document.getElementById("playerChallenger").getAttribute("data-nick");
-        let passChallenger = document.getElementById("playerChallenger").getAttribute("data-pass");
-        let nickOpponent = document.getElementById("playerOpponent").getAttribute("data-nick");
-        let passOpponent = document.getElementById("playerOpponent").getAttribute("data-pass");
-        console.log(nickChallenger, "NICK KCIN");
-        console.log(typeof turn); // Debería decir "string" si es una cadena de texto
-        console.log(typeof nickChallenger);
-        if (matchOnGoing) {
-            if (turn.trim() === nickOpponent.trim()) {
-                console.log("entra?*^Ç^?");
-                turn = nickChallenger;
-            } else if (turn.trim() === nickChallenger.trim()) {
-                console.log("mnbcxdgfseNRTSDA");
-                turn = nickOpponent;
+        console.log("turno::::"  + turn)
+        console.log(document.getElementById("nick").value + "nick")
+        //TODO if below, to not let change turn when is not your turn   
+        // if (turn !== document.getElementById("nick").value) {
+            console.log("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
+            let nickChallenger = document.getElementById("playerChallenger").getAttribute("data-nick");
+            let passChallenger = document.getElementById("playerChallenger").getAttribute("data-pass");
+            let nickOpponent = document.getElementById("playerOpponent").getAttribute("data-nick");
+            let passOpponent = document.getElementById("playerOpponent").getAttribute("data-pass");
+            console.log(nickChallenger, "NICK KCIN");
+            console.log(typeof turn);
+            console.log(typeof nickChallenger);
+            if (matchOnGoing) {
+                if (turn.trim() === nickOpponent.trim()) {
+                    console.log("entra?*^Ç^?");
+                    turn = nickChallenger;
+                } else if (turn.trim() === nickChallenger.trim()) {
+                    console.log("mnbcxdgfseNRTSDA");
+                    turn = nickOpponent;
+                }
+                console.log("turno de " + turn)
+                let infoMatchTurn = document.getElementById("infoMatch");
+                infoMatchTurn.classList.remove('d-none');
+                infoMatchTurn.classList.add('d-flex');
+                infoMatchTurn.innerHTML = "Turn: " + turn;
+                socket.send(JSON.stringify({ "turn": turn, "cell": cell.getAttribute('data-cell-index'), "nickChallenger": nickChallenger, "passChallenger": passChallenger, "nickOpponent": nickOpponent, "passOpponent": passOpponent }));
             }
-            console.log("turno de " + turn)
-            // socket.send(JSON.stringify({ "turn": turn, "cell": cell.getAttribute('data-cell-index'), "nickChallenger": nickChallenger, "passChallenger": passChallenger, "nickOpponent": nickOpponent, "passOpponent": passOpponent }));
-        }
+        // } else {
+        //     console.log("Iguales")
+        // }
     });
 });
 

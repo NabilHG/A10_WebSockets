@@ -198,7 +198,7 @@ ws_server.on('request', (request) => {
             }
           } else {
             connexions.forEach(conn => {
-              if(typeof conn.nick !== 'undefined' && conn.nick !== 'undefined'){
+              if (typeof conn.nick !== 'undefined' && conn.nick !== 'undefined') {
                 conn.conn.send(JSON.stringify(messageObj));
               }
             });
@@ -207,21 +207,21 @@ ws_server.on('request', (request) => {
         }
 
         //manage match
-        if(userData.match){
+        if (userData.match) {
           connToMatch = connexions.find(conexion => conexion.nick === userData.nickOpponent && conexion.pass === userData.passOpponent);
-          if(connToMatch){
+          if (connToMatch) {
             connToMatch.conn.send(JSON.stringify({ "match": true, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
           } else {
             console.log("not found");
           }
         }
 
-        if(userData.acceptedMatch){
+        if (userData.acceptedMatch) {
           console.log(userData, "acceptedMatch");
           connToMatchChallenger = connexions.find(conexion => conexion.nick === userData.nickChallenger && conexion.pass === userData.passChallenger);
           console.log(connToMatchChallenger, "**");
           connToMatchChallenger.conn.send(JSON.stringify({ "acceptedMatch": true, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
-        } else if(userData.acceptedMatch == false) {
+        } else if (userData.acceptedMatch == false) {
           console.log(userData, "Not acceptedMatch");
           connToMatchChallenger = connexions.find(conexion => conexion.nick === userData.nickChallenger && conexion.pass === userData.passChallenger);
           console.log(connToMatchChallenger, "?");
@@ -243,6 +243,38 @@ ws_server.on('request', (request) => {
             connToDelete.conn.close();
             connexions.splice(connexions.indexOf(connToDelete), 1);
           }
+        }
+
+        //handling turn
+        let connToSendTurn;
+        let nextPlayerTurn = [];
+        let currentPlayerTurn = [];
+        if (userData.turn) {
+          // console.log("/nHERE", userData, "HERE");
+          //send to both players the updated board
+          // if (!userData.boardFilled) {
+          if (userData.turn == userData.nickOpponent) {
+            console.log(userData.turn, "current turn opp");
+            nextPlayerTurn.nick = userData.nickChallenger;
+            nextPlayerTurn.pass = userData.passChallenger;
+            currentPlayerTurn.nick = userData.nickOpponent;
+            currentPlayerTurn.pass = userData.passOpponent;
+          } else if (userData.turn == userData.nickChallenger) {
+            console.log(userData.turn, "current turn Chall");
+            nextPlayerTurn.nick = userData.nickOpponent;
+            nextPlayerTurn.pass = userData.passOpponent;
+            currentPlayerTurn.nick = userData.nickChallenger;
+            currentPlayerTurn.pass = userData.passChallenger;
+          }
+          console.log(nextPlayerTurn.nick, "Next player nick");
+          console.log(currentPlayerTurn.nick, "Current player nick");
+          
+          connToSendTurnNextPlayer = connexions.find(conexion => conexion.nick === nextPlayerTurn.nick && conexion.pass === nextPlayerTurn.pass);
+          connToSendTurnCurrentPlayer = connexions.find(conexion => conexion.nick === currentPlayerTurn.nick && conexion.pass === currentPlayerTurn.pass);
+          
+          connToSendTurnNextPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "nickChallenger": userData.nick, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+          connToSendTurnCurrentPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "nickChallenger": userData.nick, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+          // }
         }
 
         //send all conexiones new user logged in
@@ -269,8 +301,6 @@ function addConn(connexions, nick, pass, conn) {
   if (!existUser) {
     connexions.push({ nick: nick, pass: pass, conn: conn });
     console.log(`Usuario ${nick} añadido.`);
-  } else {
-    console.log(`El usuario ${nick} ya existe.`);
   }
 }
 
