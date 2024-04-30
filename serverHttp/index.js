@@ -326,10 +326,9 @@ function extractContentMsg(msg) {
 
 document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
     cell.addEventListener('click', function () {
-        console.log("turno::::"  + turn)
-        console.log(document.getElementById("nick").value + "nick")
-        //TODO if below, to not let change turn when is not your turn   
-        // if (turn !== document.getElementById("nick").value) {
+       
+        // TODO if below, to not let change turn when is not your turn   
+        if (turn === document.getElementById("nick").value) {
             console.log("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
             let nickChallenger = document.getElementById("playerChallenger").getAttribute("data-nick");
             let passChallenger = document.getElementById("playerChallenger").getAttribute("data-pass");
@@ -353,9 +352,13 @@ document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
                 infoMatchTurn.innerHTML = "Turn: " + turn;
                 socket.send(JSON.stringify({ "turn": turn, "cell": cell.getAttribute('data-cell-index'), "nickChallenger": nickChallenger, "passChallenger": passChallenger, "nickOpponent": nickOpponent, "passOpponent": passOpponent }));
             }
-        // } else {
-        //     console.log("Iguales")
-        // }
+        } else {
+            console.log("not your turn");
+            let infoMatchNotTurn = document.getElementById("infoMatch");
+            infoMatchNotTurn.classList.remove('d-none');
+            infoMatchNotTurn.classList.add('d-flex');
+            infoMatchNotTurn.innerHTML += "<b>&nbsp;Not your turn</b>";
+        }
     });
 });
 
