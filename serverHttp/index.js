@@ -26,7 +26,6 @@ document.getElementById("register").addEventListener("click", function () {
                 info.innerHTML = "Error: " + error;
             });
     } else {
-        console.log("match on going");
         alertForbiddenAction();
     }
 });
@@ -34,6 +33,7 @@ document.getElementById("register").addEventListener("click", function () {
 let socket;
 let matchOnGoing = false;
 let turn = '';
+
 document.getElementById("login").addEventListener('click', function () {
     if (!matchOnGoing) {
         let form = new FormData();
@@ -79,7 +79,6 @@ document.getElementById("login").addEventListener('click', function () {
 
                                                 let nickClick = this.getAttribute('data-nick');
                                                 let passClick = this.getAttribute('data-pass');
-                                                console.log(nickClick, passClick);
                                                 //adding info to a div to have the last user click, necessary to start the game
                                                 document.getElementById('usersClicked').setAttribute("data-nick", nickClick);
                                                 document.getElementById('usersClicked').setAttribute("data-pass", passClick);
@@ -90,8 +89,6 @@ document.getElementById("login").addEventListener('click', function () {
                                 }
                             }
                             console.log("text del servidor:", dataUser);
-                            console.log("NICK:", dataUser.nick);
-                            console.log("Add:", dataUser.addUser);
 
                             let userConnectedArray = Array.from(userConnectedDisplay);
                             //removing any repeated user in the display before uploading
@@ -124,7 +121,6 @@ document.getElementById("login").addEventListener('click', function () {
 
                                         let nickClick = this.getAttribute('data-nick');
                                         let passClick = this.getAttribute('data-pass');
-                                        console.log(nickClick, passClick);
                                         //adding info to a div to have the last user click, necessary to start the game
                                         document.getElementById('usersClicked').setAttribute("data-nick", nickClick);
                                         document.getElementById('usersClicked').setAttribute("data-pass", passClick);
@@ -139,8 +135,6 @@ document.getElementById("login").addEventListener('click', function () {
                                 let divToAppend = document.createElement("div");
                                 divToAppend.innerHTML = "From " + dataUser.from + ": " + dataUser.message;
                                 chat.appendChild(divToAppend);
-                            } else {
-                                console.log(dataUser.messageObj, "QQ");
                             }
 
                             //handling turn
@@ -150,12 +144,29 @@ document.getElementById("login").addEventListener('click', function () {
                                 infoMatchTurn.classList.remove('d-none');
                                 infoMatchTurn.classList.add('d-flex');
                                 infoMatchTurn.innerHTML = "Turn: " + dataUser.turn;
+                                console.log(dataUser, "INFO TURNO");
+                                console.log(document.querySelectorAll('[data-cell-index]'), "CELDAS");
+                                let cells = document.querySelectorAll('[data-cell-index]');
+                                for (let i = 0; i < dataUser.board.length; i++) {
+                                    cells[i].innerHTML = dataUser.board[i];
+                                }
+                                //checking board
+                                let infoCurrentBoard = checkBoard(cells);
+                                if(infoCurrentBoard !== "Draw"){
+                                    if(infoCurrentBoard == 'X'){
+                                        infoMatchTurn.innerHTML = "Winner: <b>&nbsp" + dataUser.nickChallenger + "&nbsp</b>";
+                                    } else {
+                                        infoMatchTurn.innerHTML = "Winner: <b>&nbsp" + dataUser.nickOpponent + "&nbsp</b>";
+                                    }
+                                } else {
+                                    infoMatchTurn.innerHTML = "<b>Draw</b>";
+                                }
+
                                 console.log(dataUser, "TURNNRUT")
                             }
 
                             //handling match
                             if (dataUser.match) {
-                                console.log("////////tenemos match");
                                 let infoMatch = document.getElementById("infoMatch");
                                 let btnAccept = document.getElementById("btnAccept");
                                 let btnDecline = document.getElementById("btnDecline");
@@ -198,10 +209,7 @@ document.getElementById("login").addEventListener('click', function () {
                                 infoMatch.classList.add('d-flex');
                                 showPlayersPlaying(dataUser.nickChallenger, dataUser.passChallenger, dataUser.nickOpponent, dataUser.passOpponent);
                                 turn = dataUser.nickChallenger;
-
-                                console.log("******match accepted******");
                             } else if (dataUser.acceptedMatch == false) {
-                                console.log("???**??");
                                 matchOnGoing = false;
                                 let infoMatch = document.getElementById("infoMatch");
                                 infoMatch.classList.remove('d-none');
@@ -245,7 +253,6 @@ document.getElementById("login").addEventListener('click', function () {
             info.innerHTML = "Error: " + error;
         });
     } else {
-        console.log("match on going");
         alertForbiddenAction();
     }
 
@@ -291,7 +298,6 @@ document.getElementById("logOut").addEventListener('click', function () {
             info.innerHTML = "Error: " + error;
         });
     } else {
-        console.log("match on going");
         alertForbiddenAction();
     }
 });
@@ -326,7 +332,6 @@ function extractContentMsg(msg) {
 
 document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
     cell.addEventListener('click', function () {
-       
         // TODO if below, to not let change turn when is not your turn   
         if (turn === document.getElementById("nick").value) {
             console.log("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
@@ -334,26 +339,40 @@ document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
             let passChallenger = document.getElementById("playerChallenger").getAttribute("data-pass");
             let nickOpponent = document.getElementById("playerOpponent").getAttribute("data-nick");
             let passOpponent = document.getElementById("playerOpponent").getAttribute("data-pass");
-            console.log(nickChallenger, "NICK KCIN");
-            console.log(typeof turn);
-            console.log(typeof nickChallenger);
-            if (matchOnGoing) {
-                if (turn.trim() === nickOpponent.trim()) {
-                    console.log("entra?*^Ç^?");
-                    turn = nickChallenger;
-                } else if (turn.trim() === nickChallenger.trim()) {
-                    console.log("mnbcxdgfseNRTSDA");
-                    turn = nickOpponent;
+
+            if (cell.innerHTML.trim() === "") {
+                if (matchOnGoing) {
+                    let indexToPlace;
+                    if (turn == nickChallenger) {
+                        cell.innerHTML = "X";
+                        //tiene que ir en el onmessage
+                        indexToPlace = cell.getAttribute('data-cell-index');
+                        // console.log(indexToPlace, "indice");
+                        // board.splice(indexToPlace, 1, "X");
+                    } else if (turn == nickOpponent) {
+                        cell.innerHTML = "O";
+                        indexToPlace = cell.getAttribute('data-cell-index');
+                        // console.log(indexToPlace, "indice");
+                        // board.splice(indexToPlace, 1, "O");
+                    }
+                    if (turn.trim() === nickOpponent.trim()) {
+                        turn = nickChallenger;
+                    } else if (turn.trim() === nickChallenger.trim()) {
+                        turn = nickOpponent;
+                    }
+                    let infoMatchTurn = document.getElementById("infoMatch");
+                    infoMatchTurn.classList.remove('d-none');
+                    infoMatchTurn.classList.add('d-flex');
+                    infoMatchTurn.innerHTML = "Turn: " + turn;
+                    socket.send(JSON.stringify({ "turn": turn, "cell": cell.getAttribute('data-cell-index'), "indexToPlace": indexToPlace, "nickChallenger": nickChallenger, "passChallenger": passChallenger, "nickOpponent": nickOpponent, "passOpponent": passOpponent }));
                 }
-                console.log("turno de " + turn)
+            } else {
                 let infoMatchTurn = document.getElementById("infoMatch");
                 infoMatchTurn.classList.remove('d-none');
                 infoMatchTurn.classList.add('d-flex');
-                infoMatchTurn.innerHTML = "Turn: " + turn;
-                socket.send(JSON.stringify({ "turn": turn, "cell": cell.getAttribute('data-cell-index'), "nickChallenger": nickChallenger, "passChallenger": passChallenger, "nickOpponent": nickOpponent, "passOpponent": passOpponent }));
+                infoMatchTurn.innerHTML = "That cell has already content";
             }
         } else {
-            console.log("not your turn");
             let infoMatchNotTurn = document.getElementById("infoMatch");
             infoMatchNotTurn.classList.remove('d-none');
             infoMatchNotTurn.classList.add('d-flex');
@@ -381,7 +400,6 @@ document.getElementById("btnStart").addEventListener('click', function () {
             socket.send(JSON.stringify({ "match": true, "nickChallenger": nickChallenger, "passChallenger": passChallenger, "nickOpponent": nickOpponent, "passOpponent": passOpponent }));
         }
     } else {
-        console.log("match on going");
         alertForbiddenAction();
     }
 });
@@ -399,4 +417,37 @@ function alertForbiddenAction() {
         infoMatchOnGoing.classList.add('d-none');
         showingForbbidenAction = false;
     }, 2000);
+}
+
+
+function checkBoard(cells) {
+    // Assuming 'cells' is already an array; otherwise use Array.from(cells) if needed
+    cells = Array.from(cells);  // Convert NodeList or other to an array
+
+    const winConditions = [
+        [0, 1, 2], // First row
+        [3, 4, 5], // Second row
+        [6, 7, 8], // Third row
+        [0, 3, 6], // First column
+        [1, 4, 7], // Second column
+        [2, 5, 8], // Third column
+        [0, 4, 8], // Left-to-right diagonal
+        [2, 4, 6]  // Right-to-left diagonal
+    ];
+
+    // Check if someone has won
+    for (let condition of winConditions) {
+        const [a, b, c] = condition;
+        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
+            return cells[a];  // Returns 'X' or 'O' depending on the winner
+        }
+    }
+
+    // Check for a draw only after confirming that no one has won yet
+    if (cells.every(cell => cell !== '')) {
+        return 'Draw';
+    }
+
+    // If no winner and the game is not a draw, then the game is still ongoing
+    return null;
 }

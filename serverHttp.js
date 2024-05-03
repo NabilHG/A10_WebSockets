@@ -173,6 +173,9 @@ const ws_server = new WebSocketServer({
 
 let connexions = [];
 
+let board = ['', '', '', '', '', '', '', '', ''];
+
+
 ws_server.on('request', (request) => {
   const conn = request.accept(null, request.origin);
 
@@ -259,21 +262,23 @@ ws_server.on('request', (request) => {
             nextPlayerTurn.pass = userData.passChallenger;
             currentPlayerTurn.nick = userData.nickOpponent;
             currentPlayerTurn.pass = userData.passOpponent;
+            board.splice(userData.indexToPlace, 1, "X");
           } else if (userData.turn == userData.nickChallenger) {
             console.log(userData.turn, "current turn Chall");
             nextPlayerTurn.nick = userData.nickOpponent;
             nextPlayerTurn.pass = userData.passOpponent;
             currentPlayerTurn.nick = userData.nickChallenger;
             currentPlayerTurn.pass = userData.passChallenger;
+            board.splice(userData.indexToPlace, 1, "O");
           }
           console.log(nextPlayerTurn.nick, "Next player nick");
           console.log(currentPlayerTurn.nick, "Current player nick");
-          
+
           connToSendTurnNextPlayer = connexions.find(conexion => conexion.nick === nextPlayerTurn.nick && conexion.pass === nextPlayerTurn.pass);
           connToSendTurnCurrentPlayer = connexions.find(conexion => conexion.nick === currentPlayerTurn.nick && conexion.pass === currentPlayerTurn.pass);
-          
-          connToSendTurnNextPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "nickChallenger": userData.nick, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
-          connToSendTurnCurrentPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "nickChallenger": userData.nick, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+          console.log(board, "CURRENT BOARD");
+          connToSendTurnNextPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "nickChallenger": userData.nick, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+          connToSendTurnCurrentPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "nickChallenger": userData.nick, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
           // }
         }
 
