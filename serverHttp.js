@@ -175,6 +175,32 @@ let connexions = [];
 
 let board = ['', '', '', '', '', '', '', '', ''];
 
+function checkForWinner(board) {
+  const winConditions = [
+    [0, 1, 2], // Primera fila
+    [3, 4, 5], // Segunda fila
+    [6, 7, 8], // Tercera fila
+    [0, 3, 6], // Primera columna
+    [1, 4, 7], // Segunda columna
+    [2, 5, 8], // Tercera columna
+    [0, 4, 8], // Diagonal de izquierda a derecha
+    [2, 4, 6]  // Diagonal de derecha a izquierda
+  ];
+  let data = null;
+  for (const condition of winConditions) {
+    const [a, b, c] = condition;
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      data  = board[a]; // Devuelve el símbolo del ganador (X o O)
+    }
+  }
+
+
+  if (!board.includes('')) {
+    data = 'Draw';
+  }
+
+  return data !== null ? data : null; // No hay un ganador
+}
 
 ws_server.on('request', (request) => {
   const conn = request.accept(null, request.origin);
@@ -271,14 +297,18 @@ ws_server.on('request', (request) => {
             currentPlayerTurn.pass = userData.passChallenger;
             board.splice(userData.indexToPlace, 1, "O");
           }
+          let winner = checkForWinner(board);
+
+          console.log(winner);
+          //check board to find winner          
           console.log(nextPlayerTurn.nick, "Next player nick");
           console.log(currentPlayerTurn.nick, "Current player nick");
 
           connToSendTurnNextPlayer = connexions.find(conexion => conexion.nick === nextPlayerTurn.nick && conexion.pass === nextPlayerTurn.pass);
           connToSendTurnCurrentPlayer = connexions.find(conexion => conexion.nick === currentPlayerTurn.nick && conexion.pass === currentPlayerTurn.pass);
           console.log(board, "CURRENT BOARD");
-          connToSendTurnNextPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "nickChallenger": userData.nick, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
-          connToSendTurnCurrentPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "nickChallenger": userData.nick, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+          connToSendTurnNextPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "winner": winner, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+          connToSendTurnCurrentPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "winner": winner, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
           // }
         }
 

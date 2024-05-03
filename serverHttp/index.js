@@ -143,23 +143,27 @@ document.getElementById("login").addEventListener('click', function () {
                                 let infoMatchTurn = document.getElementById("infoMatch");
                                 infoMatchTurn.classList.remove('d-none');
                                 infoMatchTurn.classList.add('d-flex');
-                                infoMatchTurn.innerHTML = "Turn: " + dataUser.turn;
+                                infoMatchTurn.innerHTML = "Turn: " + turn;
                                 console.log(dataUser, "INFO TURNO");
                                 console.log(document.querySelectorAll('[data-cell-index]'), "CELDAS");
                                 let cells = document.querySelectorAll('[data-cell-index]');
                                 for (let i = 0; i < dataUser.board.length; i++) {
                                     cells[i].innerHTML = dataUser.board[i];
                                 }
+
                                 //checking board
-                                let infoCurrentBoard = checkBoard(cells);
-                                if(infoCurrentBoard !== "Draw"){
-                                    if(infoCurrentBoard == 'X'){
-                                        infoMatchTurn.innerHTML = "Winner: <b>&nbsp" + dataUser.nickChallenger + "&nbsp</b>";
+                                if(dataUser.winner !== null){
+                                    matchOnGoing = false;
+                                    if(dataUser.winner !== "Draw"){
+                                        let symbol = dataUser.winner == 'X' ? 'X' : 'O';
+                                        if(symbol == 'X'){
+                                            infoMatchTurn.innerHTML = "<b>&nbsp" + dataUser.nickChallenger + "&nbsp</b> has won";
+                                        } else {
+                                            infoMatchTurn.innerHTML = "<b>&nbsp" + dataUser.nickOpponent + "&nbsp</b> has won";
+                                        }
                                     } else {
-                                        infoMatchTurn.innerHTML = "Winner: <b>&nbsp" + dataUser.nickOpponent + "&nbsp</b>";
+                                        infoMatchTurn.innerHTML = "<b>Draw</b>";
                                     }
-                                } else {
-                                    infoMatchTurn.innerHTML = "<b>Draw</b>";
                                 }
 
                                 console.log(dataUser, "TURNNRUT")
@@ -332,7 +336,6 @@ function extractContentMsg(msg) {
 
 document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
     cell.addEventListener('click', function () {
-        // TODO if below, to not let change turn when is not your turn   
         if (turn === document.getElementById("nick").value) {
             console.log("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
             let nickChallenger = document.getElementById("playerChallenger").getAttribute("data-nick");
@@ -376,7 +379,7 @@ document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
             let infoMatchNotTurn = document.getElementById("infoMatch");
             infoMatchNotTurn.classList.remove('d-none');
             infoMatchNotTurn.classList.add('d-flex');
-            infoMatchNotTurn.innerHTML += "<b>&nbsp;Not your turn</b>";
+            infoMatchNotTurn.innerHTML = "<b>&nbsp;Not your turn</b>";
         }
     });
 });
@@ -417,37 +420,4 @@ function alertForbiddenAction() {
         infoMatchOnGoing.classList.add('d-none');
         showingForbbidenAction = false;
     }, 2000);
-}
-
-
-function checkBoard(cells) {
-    // Assuming 'cells' is already an array; otherwise use Array.from(cells) if needed
-    cells = Array.from(cells);  // Convert NodeList or other to an array
-
-    const winConditions = [
-        [0, 1, 2], // First row
-        [3, 4, 5], // Second row
-        [6, 7, 8], // Third row
-        [0, 3, 6], // First column
-        [1, 4, 7], // Second column
-        [2, 5, 8], // Third column
-        [0, 4, 8], // Left-to-right diagonal
-        [2, 4, 6]  // Right-to-left diagonal
-    ];
-
-    // Check if someone has won
-    for (let condition of winConditions) {
-        const [a, b, c] = condition;
-        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
-            return cells[a];  // Returns 'X' or 'O' depending on the winner
-        }
-    }
-
-    // Check for a draw only after confirming that no one has won yet
-    if (cells.every(cell => cell !== '')) {
-        return 'Draw';
-    }
-
-    // If no winner and the game is not a draw, then the game is still ongoing
-    return null;
 }
