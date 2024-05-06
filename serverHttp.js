@@ -190,7 +190,7 @@ function checkForWinner(board) {
   for (const condition of winConditions) {
     const [a, b, c] = condition;
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      data  = board[a]; // Devuelve el símbolo del ganador (X o O)
+      data = board[a]; // Devuelve el símbolo del ganador (X o O)
     }
   }
 
@@ -323,7 +323,24 @@ ws_server.on('request', (request) => {
     }
   });
 
-  conn.on('close', () => {
+  conn.on('close', (evt) => {
+
+  
+    let  connToDelete;
+    // connToDelete = connexions.find(conexion => conexion.conn === conn);
+    for(let k=0; k< connexions.length;k++){
+      if(connexions[k].conn==conn){
+        connToDelete=connexions[k];
+        break;
+      }
+    }
+
+    connexions.forEach(connect => {
+      connect.conn.send(JSON.stringify({ "nick": connToDelete.nick, "pass": connToDelete.pass, "addUser": false }));
+    });
+    conn.close();
+    connexions.splice(connexions.indexOf(conn), 1);
+
     console.log("Tancada la connexió");
   });
 });
