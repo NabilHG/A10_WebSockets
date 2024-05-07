@@ -58,7 +58,6 @@ document.getElementById("login").addEventListener('click', function () {
 
                             let userConnectedDisplay = document.getElementById("usersConnected").getElementsByTagName("div");
                             let dataUser = JSON.parse(data.data);
-                            console.log(dataUser, "data");
 
                             // printing all users connected when first log in
                             if (dataUser.connectedUsers) {
@@ -88,7 +87,6 @@ document.getElementById("login").addEventListener('click', function () {
                                     }
                                 }
                             }
-                            console.log("text del servidor:", dataUser);
 
                             let userConnectedArray = Array.from(userConnectedDisplay);
                             //removing any repeated user in the display before uploading
@@ -144,8 +142,6 @@ document.getElementById("login").addEventListener('click', function () {
                                 infoMatchTurn.classList.remove('d-none');
                                 infoMatchTurn.classList.add('d-flex');
                                 infoMatchTurn.innerHTML = "Turn: " + turn;
-                                console.log(dataUser, "INFO TURNO");
-                                console.log(document.querySelectorAll('[data-cell-index]'), "CELDAS");
                                 let cells = document.querySelectorAll('[data-cell-index]');
                                 for (let i = 0; i < dataUser.board.length; i++) {
                                     cells[i].innerHTML = dataUser.board[i];
@@ -165,8 +161,6 @@ document.getElementById("login").addEventListener('click', function () {
                                         infoMatchTurn.innerHTML = "<b>Draw</b>";
                                     }
                                 }
-
-                                console.log(dataUser, "TURNNRUT")
                             }
 
                             //handling match
@@ -337,7 +331,6 @@ function extractContentMsg(msg) {
 document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
     cell.addEventListener('click', function () {
         if (turn === document.getElementById("nick").value) {
-            console.log("Has hecho clic en la posición: " + cell.getAttribute('data-cell-index'));
             let nickChallenger = document.getElementById("playerChallenger").getAttribute("data-nick");
             let passChallenger = document.getElementById("playerChallenger").getAttribute("data-pass");
             let nickOpponent = document.getElementById("playerOpponent").getAttribute("data-nick");
@@ -348,15 +341,10 @@ document.querySelectorAll('[data-cell-index]').forEach(function (cell) {
                     let indexToPlace;
                     if (turn == nickChallenger) {
                         cell.innerHTML = "X";
-                        //tiene que ir en el onmessage
                         indexToPlace = cell.getAttribute('data-cell-index');
-                        // console.log(indexToPlace, "indice");
-                        // board.splice(indexToPlace, 1, "X");
                     } else if (turn == nickOpponent) {
                         cell.innerHTML = "O";
                         indexToPlace = cell.getAttribute('data-cell-index');
-                        // console.log(indexToPlace, "indice");
-                        // board.splice(indexToPlace, 1, "O");
                     }
                     if (turn.trim() === nickOpponent.trim()) {
                         turn = nickChallenger;

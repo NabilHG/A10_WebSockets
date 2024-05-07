@@ -177,29 +177,26 @@ let board = ['', '', '', '', '', '', '', '', ''];
 
 function checkForWinner(board) {
   const winConditions = [
-    [0, 1, 2], // Primera fila
-    [3, 4, 5], // Segunda fila
-    [6, 7, 8], // Tercera fila
-    [0, 3, 6], // Primera columna
-    [1, 4, 7], // Segunda columna
-    [2, 5, 8], // Tercera columna
-    [0, 4, 8], // Diagonal de izquierda a derecha
-    [2, 4, 6]  // Diagonal de derecha a izquierda
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
   ];
   let data = null;
   for (const condition of winConditions) {
     const [a, b, c] = condition;
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      data = board[a]; // Devuelve el símbolo del ganador (X o O)
+      data = board[a];
     }
   }
-
-
   if (!board.includes('')) {
     data = 'Draw';
   }
-
-  return data !== null ? data : null; // No hay un ganador
+  return data !== null ? data : null;
 }
 
 ws_server.on('request', (request) => {
@@ -208,7 +205,6 @@ ws_server.on('request', (request) => {
   conn.on('message', (message) => {
     if (message.type === 'utf8') {
       try {
-        console.log(message.utf8Data);
         const userData = JSON.parse(message.utf8Data);
 
         //send users connected first time log in
@@ -240,20 +236,14 @@ ws_server.on('request', (request) => {
           connToMatch = connexions.find(conexion => conexion.nick === userData.nickOpponent && conexion.pass === userData.passOpponent);
           if (connToMatch) {
             connToMatch.conn.send(JSON.stringify({ "match": true, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
-          } else {
-            console.log("not found");
           }
         }
 
         if (userData.acceptedMatch) {
-          console.log(userData, "acceptedMatch");
           connToMatchChallenger = connexions.find(conexion => conexion.nick === userData.nickChallenger && conexion.pass === userData.passChallenger);
-          console.log(connToMatchChallenger, "**");
           connToMatchChallenger.conn.send(JSON.stringify({ "acceptedMatch": true, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
         } else if (userData.acceptedMatch == false) {
-          console.log(userData, "Not acceptedMatch");
           connToMatchChallenger = connexions.find(conexion => conexion.nick === userData.nickChallenger && conexion.pass === userData.passChallenger);
-          console.log(connToMatchChallenger, "?");
           connToMatchChallenger.conn.send(JSON.stringify({ "acceptedMatch": false, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
         }
 
@@ -279,18 +269,13 @@ ws_server.on('request', (request) => {
         let nextPlayerTurn = [];
         let currentPlayerTurn = [];
         if (userData.turn) {
-          // console.log("/nHERE", userData, "HERE");
-          //send to both players the updated board
-          // if (!userData.boardFilled) {
           if (userData.turn == userData.nickOpponent) {
-            console.log(userData.turn, "current turn opp");
             nextPlayerTurn.nick = userData.nickChallenger;
             nextPlayerTurn.pass = userData.passChallenger;
             currentPlayerTurn.nick = userData.nickOpponent;
             currentPlayerTurn.pass = userData.passOpponent;
             board.splice(userData.indexToPlace, 1, "X");
           } else if (userData.turn == userData.nickChallenger) {
-            console.log(userData.turn, "current turn Chall");
             nextPlayerTurn.nick = userData.nickOpponent;
             nextPlayerTurn.pass = userData.passOpponent;
             currentPlayerTurn.nick = userData.nickChallenger;
@@ -299,16 +284,14 @@ ws_server.on('request', (request) => {
           }
           let winner = checkForWinner(board);
 
-          console.log(winner);
-          //check board to find winner          
-          console.log(nextPlayerTurn.nick, "Next player nick");
-          console.log(currentPlayerTurn.nick, "Current player nick");
-
           connToSendTurnNextPlayer = connexions.find(conexion => conexion.nick === nextPlayerTurn.nick && conexion.pass === nextPlayerTurn.pass);
           connToSendTurnCurrentPlayer = connexions.find(conexion => conexion.nick === currentPlayerTurn.nick && conexion.pass === currentPlayerTurn.pass);
-          console.log(board, "CURRENT BOARD");
-          connToSendTurnNextPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "winner": winner, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
-          connToSendTurnCurrentPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "winner": winner, "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, "passOpponent": userData.passOpponent }));
+          connToSendTurnNextPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "winner": winner, 
+          "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, 
+          "passOpponent": userData.passOpponent }));
+          connToSendTurnCurrentPlayer.conn.send(JSON.stringify({ "turn": userData.turn, "board": board, "winner": winner, 
+          "nickChallenger": userData.nickChallenger, "passChallenger": userData.passChallenger, "nickOpponent": userData.nickOpponent, 
+          "passOpponent": userData.passOpponent }));
           // }
         }
 
@@ -324,36 +307,26 @@ ws_server.on('request', (request) => {
   });
 
   conn.on('close', (evt) => {
-
-  
-    let  connToDelete;
-    // connToDelete = connexions.find(conexion => conexion.conn === conn);
-    for(let k=0; k< connexions.length;k++){
-      if(connexions[k].conn==conn){
-        connToDelete=connexions[k];
+    let connToDelete = null;
+    for (let k = 0; k < connexions.length; k++) {
+      if (connexions[k].conn == conn) {
+        connToDelete = connexions[k];
         break;
       }
     }
-
-    connexions.forEach(connect => {
-      connect.conn.send(JSON.stringify({ "nick": connToDelete.nick, "pass": connToDelete.pass, "addUser": false }));
-    });
+    if (connToDelete !== null) {
+      connexions.forEach(connect => {
+        connect.conn.send(JSON.stringify({ "nick": connToDelete.nick, "pass": connToDelete.pass, "addUser": false }));
+      });
+    }
     conn.close();
-    connexions.splice(connexions.indexOf(conn), 1);
-
-    console.log("Tancada la connexió");
+    connexions.splice(connexions.indexOf(connToDelete), 1);
   });
 });
 
-
 function addConn(connexions, nick, pass, conn) {
-
   const existUser = connexions.some(user => user.nick === nick && user.pass === pass);
-
   if (!existUser) {
     connexions.push({ nick: nick, pass: pass, conn: conn });
-    console.log(`Usuario ${nick} añadido.`);
   }
 }
-
-
